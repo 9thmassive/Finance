@@ -109,7 +109,7 @@ export default function Login() {
                                 </div>
                             </Form>
 
-                            <Link to="/registartion">
+                            <Link to="/registration">
                                 <Button className="w-100 btn ">Sing up</Button>
                             </Link>
                         </Card.Body>

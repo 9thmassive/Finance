@@ -1,4 +1,4 @@
-import './registartion/login.css'
+import './registration/login.css'
 import logo from './logo_2.png'
 
 import {
@@ -21,7 +21,7 @@ export default function Header(props) {
                     <Link to="/login">
                         <button className="btnin btn">LOG-IN </button>
                     </Link>
-                    {/* <Link to="/registartion">
+                    {/* <Link to="/registration">
                         <button className="btnin btn">Reg</button>
                     </Link> */}
                 </div>
