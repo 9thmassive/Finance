@@ -1,0 +1,52 @@
+/*#e1edeb   #82a796     #ed9734     #e84148*/
+
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@500&family=PT+Sans:ital@1&display=swap');
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media screen and (min-width: 1200px) {
+    div.example {
+        width: 100%;
+    }
+}
+
+body {
+    background-color: #ffffff;
+}
+
+.LeadingPage {
+    display: flex;
+    margin-top: 60px;
+    justify-content: center;
+}
+
+.Container {
+    justify-content: space-between;
+    width: 60%;
+    align-items: center;
+}
+
+.img-fluid {
+    display: flex;
+    cursor: pointer;
+    justify-content: flex-end;
+    float: right;
+    width: 370px;
+    height: 370px;
+    border-radius: 50%;
+}
+
+.col-6 {
+    color: #e1edeb;
+    margin-top: 25px;
+    font-family: 'Mukta', sans-serif;
+    font-family: 'PT Sans', sans-serif;
+    font-size: 20px;
+}
+
+.LeadingBtn {
+    display: block;
+    background-color: #82a796;
+    color: black;
+    font-weight: 400;
+    border-radius: 10%;
+}

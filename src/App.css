@@ -1,0 +1,74 @@
+.pieChart {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.linerChart {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.cart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.cart {
+    border: black solid 1px;
+    /* border-radius: 5px; */
+    margin-top: 20px;
+    margin-left: 20px;
+    /* box-shadow: 0 0 10px #000000; */
+    border-bottom: #f14107 solid 10px;
+    width: 200px;
+    height: 120px;
+
+    padding: 5px;
+}
+.linerChart-container {
+    display: flex;
+    justify-content: center;
+}
+.linerChartPosition {
+    margin-top: 35px;
+}
+.card_type {
+    font-size: 30px;
+    font-weight: 700;
+    color: #f14107;
+}
+.card_type_money {
+    display: flex;
+    /* align-items: center; */
+    flex-direction: column;
+    cursor: pointer;
+}
+.card_money {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 700;
+}
+.cart_and_icon_card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.drk {
+    color: black;
+}
+.login_with {
+    cursor: pointer;
+    width: 100%;
+    height: 40px;
+    border: 2px grey solid;
+    border-radius: 5px;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    flex-direction: row;
+    margin-top: 10px;
+    padding-left: 50px;
+}
+.login_with_img {
+    width: 20px;
+}

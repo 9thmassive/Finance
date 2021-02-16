@@ -1,0 +1,35 @@
+.add {
+    padding: 10px;
+    display: flex;
+}
+.expLeft {
+    margin-left: 10px;
+}
+.drop-hover:hover {
+    background-color: #d65a3159;
+}
+
+.expInput {
+    width: 260px;
+}
+.namPrice {
+    padding: 0px;
+}
+.expCheck {
+    width: 30px;
+    height: 30px;
+}
+.rate {
+    display: flex;
+    padding: 10px 0px;
+    margin-left: -20px;
+}
+.txtc {
+    color: #eeeeee;
+}
+.mainColor {
+    background-color: #d65a31;
+}
+#mainColor {
+    background-color: #d65a31;
+}
