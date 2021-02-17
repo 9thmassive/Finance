@@ -1,7 +1,7 @@
 //first three rows - from Mariam
-import React from 'react';
+/*import React from 'react';
 import ReactDOM from 'react-dom';
-import App2 from './App2';
+import App2 from './App2';*/
 
 import { render, screen } from '@testing-library/react'
 import App from './App'
@@ -15,8 +15,8 @@ test('renders learn react link', () => {
 
 
 //first paragraph - from Mariam
-it('renders without crashing', () => {
+/*it('renders without crashing', () => {
     const div = document.createElement('div');
     ReactDOM.render(<App2 />, div);
     ReactDOM.unmountComponentAtNode(div);
-  });
+  });*/

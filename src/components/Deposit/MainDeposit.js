@@ -25,7 +25,7 @@ class MainDeposit extends Component {
 
     return (
        <div className="App2">
-        <h4>I want to borrow €{amountValue}</h4>
+        <h4 >I want to borrow €{amountValue}</h4>
         <InputRange
           step={100}
           maxValue={20000}
