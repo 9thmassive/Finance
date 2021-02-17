@@ -8,13 +8,14 @@ import Signup from './components/registration/Signup'
 import User from './components/Rotation/User'
 import ForgotPassword from './components/registration/ForgotPassword'
 import Navbar from './components/NavBar/Navbar'
+import MainDeposit from './components/Deposit/MainDeposit'
 import LeadingPage from './components/leadingPage_proto/LeadingPage'
 import Transaction from './pages/Transaction'
 import Income from './pages/Income'
 import Expenses from './pages/Expenses'
 // import LeadingPage from './components/LeadingPage/LeadingPage'
 import FindSaving from './components/findSaving/FindSaving'
-import Profil from './components/profil/Profil'
+import Profile from './components/profile/Profile'
 import Dashboard from './components/Rotation/Dashboard'
 import {
     BrowserRouter as Router,
@@ -65,14 +66,14 @@ function App() {
                 {user ? <Navbar /> : null}
 
                 <Switch>
-                    <Route path="/ransaction" exact component={Transaction} />
+                    <Route path="/transaction" exact component={Transaction} />
                     <Route path="/income" component={Income} />
                     <Route path="/expenses" component={Expenses} />
                     <Route exact path="/">
                         {user ? (
                             <Redirect push to="/dashboard" />
                         ) : (
-                            <mainDeposit />
+                            <MainDeposit />
                         )}
                     </Route>
                     <Router exact path="/dashboard">
@@ -87,8 +88,8 @@ function App() {
                     <Route exact path="/user">
                         <User />
                     </Route>
-                    <Route exact path="/profil">
-                        <Profil />
+                    <Route exact path="/profile">
+                        <Profile />
                     </Route>
                     <Route exact path="/forgot-password">
                         <ForgotPassword />

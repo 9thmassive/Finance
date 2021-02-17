@@ -1,3 +1,6 @@
+//first row - from Mariam
+import MainDeposit from './components/Deposit/MainDeposit'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
@@ -10,6 +13,8 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('root')
 )
+//first row - from Mariam
+ReactDOM.render(<MainDeposit />, document.getElementById("root"));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
