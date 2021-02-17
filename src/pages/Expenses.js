@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { DropdownButton, Dropdown, Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -30,7 +30,7 @@ const expList = [
 
 function Expenses() {
     toast.configure()
-    const uid = firebase.auth().currentUser.uid
+    const uid = firebase.auth().currentUser?.uid
 
     const [group, setGroup] = useState(false)
     const [rating, setRating] = useState(0)
@@ -38,34 +38,14 @@ function Expenses() {
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
     const [dorpVal, stDropVal] = useState(expList)
 
-    const [expData, setExpData] = useState([{}])
-    const [rowData, setRowData] = useState([
-        { make: 'Toyota', model: 'Celica', price: 35000 },
-        { make: 'Ford', model: 'Mondeo', price: 32000 },
-        { make: 'Porsche', model: 'Boxter', price: 72000 },
-    ])
+    const [expData, setExpData] = useState([])
+    const [rowData, setRowData] = useState([{}])
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
     //-------------------
-
     const toDay = () => new Date().toLocaleDateString()
-
-    let dat = {
-        '15/01/2020': [
-            {
-                name: 'oil',
-                group: 'Car',
-                value: 2400,
-            },
-            {
-                name: 'oil',
-                group: 'Car',
-                value: 2400,
-            },
-        ],
-    }
 
     function userMessage(num, msg) {
         if (num === 1) {
@@ -114,10 +94,10 @@ function Expenses() {
             .doc(uid)
             .get()
             .then((doc) => {
-                if (doc.data()[toDay()]) {
+                if (doc.data()?.[toDay()]) {
                     setExpData(() => doc.data()[toDay()])
                 } else {
-                    setExpData(() => [{}])
+                    setExpData(() => [])
                 }
             })
 
@@ -136,9 +116,26 @@ function Expenses() {
                 ],
             })
 
-        console.log(expData)
+        // setRowData([
+        //     ...rowData,
+        //     {
+        //         name: nameRef.current.value,
+        //         value: priceRef.current.value,
+        //         priority: rating,
+        //     },
+        // ])
         return userMessage(1, 'Added successFull')
     }
+    useEffect(() => {
+        firebase
+            .firestore()
+            .collection('expenses')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                setRowData(() => doc.data()?.[toDay()])
+            })
+        console.log(rowData)
+    }, [expData])
 
     return (
         <div className="container ">
@@ -240,10 +237,10 @@ function Expenses() {
                     className="ag-theme-alpine"
                     style={{ height: 400, width: 600 }}
                 >
-                    <AgGridReact rowData={dat[`15/01/2020`]}>
+                    <AgGridReact rowData={rowData}>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
-                        <AgGridColumn field="group"></AgGridColumn>
+                        <AgGridColumn field="priority"></AgGridColumn>
                     </AgGridReact>
                 </div>
             </div>
