@@ -72,7 +72,7 @@ function App() {
                         {user ? (
                             <Redirect push to="/dashboard" />
                         ) : (
-                            <LeadingPage />
+                            <mainDeposit />
                         )}
                     </Route>
                     <Router exact path="/dashboard">
