@@ -1,15 +1,11 @@
-//import { IconName } from 'react-icons/io';
-//import { IconName } from 'react-icons/fa';
 import React, { useState } from 'react'
 import firebase from 'firebase'
-import * as FaIcons from 'react-icons/fa'
-import * as AiIcons from 'react-icons/ai'
-import * as GrIcons from 'react-icons/gr'
 import { Link, NavLink } from 'react-router-dom'
 import { SidebarData } from './SidebarData'
 import './Navbar.css'
 import { IconContext } from 'react-icons'
 import Logo from './../leadingPage_proto/dist/images/logo.png'
+import { nanoid } from 'nanoid'
 
 function Navbar() {
     const [sidebar, setSidebar] = useState(false)
@@ -45,10 +41,9 @@ function Navbar() {
                             return (
                                 <>
                                     <NavLink
-                                        key={index}
+                                        key={nanoid()}
                                         className={`${item.cName} pos`}
                                         to={item.path}
-                                       
                                         activeClassName="activeLink"
                                     >
                                         {item.icon}
