@@ -8,6 +8,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import './exp.css'
+
 const expList = [
     {
         nameExp: 'Auto insurance.',
@@ -35,7 +36,7 @@ function Expenses() {
     const [req, setReq] = useState(true)
 
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
-    const [dorpVal, setDropVal] = useState(expList)
+    const [dropVal, setDropVal] = useState(expList)
 
     const [expData, setExpData] = useState([])
     const [rowData, setRowData] = useState([{}])
@@ -132,65 +133,59 @@ function Expenses() {
     }, [])
 
     async function handleDropDownAddVal() {
-        setGroup(!group)
-        if (!group) {
-            if (
-                dorpVal.find((el) => el.nameExp === groupNameRef.current.value)
-            ) {
-                return userMessage(
-                    1,
-                    '😕 The group has already been added, you cannot add twice'
-                )
-            }
-            if (groupNameRef.current.value.length < 1) {
-                return setGroup(!group)
-            }
-            setDropVal((prev) => [
-                ...prev,
-                {
-                    nameExp: groupNameRef.current.value,
-                },
-            ])
+        console.log(dropVal)
+        // if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
+        //     return userMessage(
+        //         1,
+        //         '😕 The group has already been added, you cannot add twice'
+        //     )
+        // }
+        if (groupNameRef.current.value.length === 0) {
+            return setGroup(!group)
         }
         const getDropData = await firebase
             .firestore()
             .collection('user')
             .doc(uid)
-            .get('dropdown')
-        console.log()
-        if (getDropData.data().dropdown) {
-            await firebase
-                .firestore()
-                .collection('user')
-                .doc(uid)
-                .set({
-                    dropdown: [
-                        ...getDropData?.data()?.dropdown,
-                        { expData: groupNameRef.current.value },
-                    ],
-                })
-        } else {
-            await firebase
-                .firestore()
-                .collection('user')
-                .doc(uid)
-                .set({
-                    dropdown: [{ expData: groupNameRef.current.value }],
-                })
+            .get()
+        let setDropDat = getDropData.data()?.dropdown
+        if (!setDropDat) {
+            setDropDat = []
         }
+        await firebase
+            .firestore()
+            .collection('user')
+            .doc(uid)
+            .set({
+                dropdown: [
+                    ...setDropDat,
+                    { nameExp: groupNameRef.current.value },
+                ],
+            })
+        setDropDownVal(groupNameRef.current.value)
+        setGroup(true)
         return userMessage(
             2,
             '😎 The new group has been successfully added to your account'
         )
     }
-
+    useEffect(() => {
+        firebase
+            .firestore()
+            .collection('user')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                setDropVal((prev) => [...prev, doc.data()?.dropdown].flat())
+                console.log([...dropVal, doc.data()?.dropdown].flat())
+            })
+    }, [])
     return (
         <div className="container ">
             <div className="container ">
                 <div className="container add">
                     {group ? (
                         <DropdownButton id="mainColor" title={dropDownVal}>
-                            {dorpVal.map(({ nameExp }, index) => {
+                            {dropVal.map(({ nameExp }, index) => {
                                 return (
                                     <Dropdown.Item
                                         key={index}
