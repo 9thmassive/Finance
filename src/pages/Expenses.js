@@ -23,7 +23,7 @@ const expList = [
         nameExp: 'Child care',
     },
     {
-        nameExp: 'utility',
+        nameExp: 'Utility',
     },
 ]
 
@@ -37,9 +37,7 @@ function Expenses() {
 
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
     const [dropVal, setDropVal] = useState(expList)
-
-    const [expData, setExpData] = useState([])
-    const [rowData, setRowData] = useState([{}])
+    const [rowData, setRowData] = useState([])
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
@@ -49,6 +47,7 @@ function Expenses() {
     const toDay = () => new Date().toLocaleDateString().split('/').join('-')
     const thisTime = () => new Date().toLocaleTimeString()
 
+    // alert(rowData.length)
     function userMessage(num, msg) {
         if (num === 1) {
             return toast.info(msg, {
@@ -96,19 +95,6 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        // await firebase
-        //     .firestore()
-        //     .collection('expenses')
-        //     .doc(uid)
-        //     .set({
-        //         [toDay()]: {
-        //             group: selectedGroup,
-        //             name: nameRef.current.value,
-        //             value: priceRef.current.value,
-        //             priority: rating,
-        //         },
-        //     })
-
         await firebase
             .firestore()
             .collection('expenses')
@@ -176,6 +162,25 @@ function Expenses() {
                 }
             })
     }, [])
+
+    // async function getData() {
+    //     // await firebase
+    //     //     .firestore()
+    //     //     .collection('expenses')
+    //     //     .doc(uid)
+    //     //     .get((doc) => {
+    //     //         setRowData(doc.data()?.[toDay()])
+    //     //     })
+
+    //     await firebase
+    //         .firestore()
+    //         .collection('user')
+    //         .doc(uid)
+    //         .get((doc) => {
+    //             setDropVal([...dropVal, ...doc.data()?.dropdown])
+    //         })
+    // }
+    // getData()
 
     return (
         <div className="container ">
