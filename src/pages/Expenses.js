@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { Button, Spinner } from 'react-bootstrap'
 import { DropdownButton, Dropdown, Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -7,6 +8,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import './exp.css'
+
 const expList = [
     {
         nameExp: 'Auto insurance.',
@@ -21,10 +23,7 @@ const expList = [
         nameExp: 'Child care',
     },
     {
-        nameExp: 'utility',
-    },
-    {
-        nameExp: 'Other',
+        nameExp: 'Utility',
     },
 ]
 
@@ -34,18 +33,20 @@ function Expenses() {
 
     const [group, setGroup] = useState(false)
     const [rating, setRating] = useState(0)
+    const [req, setReq] = useState(true)
 
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
-    const [dorpVal, stDropVal] = useState(expList)
-
-    const [expData, setExpData] = useState([])
-    const [rowData, setRowData] = useState([{}])
+    const [dropVal, setDropVal] = useState(expList)
+    const [rowData, setRowData] = useState([])
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
+    const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
-    const toDay = () => new Date().toLocaleDateString()
+    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    const thisTime = () => new Date().toLocaleTimeString()
+
 
     function userMessage(num, msg) {
         if (num === 1) {
@@ -85,57 +86,107 @@ function Expenses() {
     //
     async function handleAddExpenses() {
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
-            return userMessage(3, 'Please add only number in a price')
+            priceRef.current.style.border = 'red solid 3px'
+
+            return userMessage(1, '🤨 Please add only number in a price')
         }
-
+        if (nameRef.current.value.length < 1) {
+            nameRef.current.style.border = 'red solid 3px'
+            return userMessage(1, '😕 Name - Input should not be empty')
+        }
+        setReq((prev) => !prev)
         await firebase
             .firestore()
             .collection('expenses')
             .doc(uid)
-            .get()
-            .then((doc) => {
-                if (doc.data()?.[toDay()]) {
-                    setExpData(() => doc.data()[toDay()])
-                } else {
-                    setExpData(() => [])
-                }
+            .update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    group: selectedGroup,
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    priority: rating,
+                    date: toDay() + thisTime(),
+                }),
             })
 
-        await firebase
-            .firestore()
-            .collection('expenses')
-            .doc(uid)
-            .set({
-                [toDay()]: [
-                    ...expData,
-                    {
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        priority: rating,
-                    },
-                ],
-            })
-
-        // setRowData([
-        //     ...rowData,
-        //     {
-        //         name: nameRef.current.value,
-        //         value: priceRef.current.value,
-        //         priority: rating,
-        //     },
-        // ])
+        setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
     }
+
     useEffect(() => {
         firebase
             .firestore()
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
-                setRowData(() => doc.data()?.[toDay()])
+                if (doc.data()?.[toDay()]) {
+                    setRowData(doc.data()?.[toDay()].reverse())
+                }
             })
-        console.log(rowData)
-    }, [expData])
+
+
+    }, [])
+
+    async function handleDropDownAddVal() {
+        if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
+            return userMessage(
+                1,
+                '😕 The group has already been added, you cannot add twice'
+            )
+        }
+        if (groupNameRef.current.value.length === 0) {
+            return setGroup(!group)
+        }
+        await firebase
+            .firestore()
+            .collection('user')
+            .doc(uid)
+            .update({
+                dropdown: firebase.firestore.FieldValue.arrayUnion({
+                    nameExp: groupNameRef.current.value,
+                }),
+            })
+        setDropDownVal(groupNameRef.current.value)
+        setGroup((prev) => !prev)
+        return userMessage(
+            2,
+            '😎 The new group has been successfully added to your account'
+        )
+    }
+    useEffect(() => {
+        firebase
+            .firestore()
+            .collection('user')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                if (doc.data()?.dropdown) {
+
+                    setDropVal([...dropVal, ...doc.data()?.dropdown])
+                }
+            })
+    }, [])
+
+    // useEffect(() => {
+    //     async function getData() {
+    //         await firebase
+    //             .firestore()
+    //             .collection('expenses')
+    //             .doc(uid)
+    //             .get((doc) => {
+    //                 setRowData(doc.data()?.[toDay()])
+    //             })
+
+    //         await firebase
+    //             .firestore()
+    //             .collection('user')
+    //             .doc(uid)
+    //             .get((doc) => {
+    //                 setDropVal([...dropVal, ...doc.data()?.dropdown])
+    //             })
+    //     }
+    //     getData()
+    //     alert()
+    // }, [])
 
     return (
         <div className="container ">
@@ -143,14 +194,19 @@ function Expenses() {
                 <div className="container add">
                     {group ? (
                         <DropdownButton id="mainColor" title={dropDownVal}>
-                            {dorpVal.map(({ nameExp }, index) => {
+                            {dropVal.map(({ nameExp }, index) => {
                                 return (
                                     <Dropdown.Item
                                         key={index}
                                         className="drop-hover"
                                         as="button"
                                         onClick={(e) => {
-                                            setDropDownVal(e.target.outerText)
+                                            setDropDownVal(
+                                                () => e.target.outerText
+                                            )
+                                            setSelectedGroup(
+                                                () => e.target.outerText
+                                            )
                                         }}
                                     >
                                         {nameExp}
@@ -168,29 +224,11 @@ function Expenses() {
 
                     <button
                         className="btn mainColor expLeft "
-                        onClick={() => {
-                            setGroup(!group)
-                            if (!group) {
-                                if (
-                                    dorpVal.find(
-                                        (el) =>
-                                            el.nameExp ===
-                                            groupNameRef.current.value
-                                    )
-                                ) {
-                                    return userMessage(
-                                        1,
-                                        '😕 The group has already been added, you cannot add twice'
-                                    )
-                                }
-                                stDropVal((prev) => [
-                                    ...prev,
-                                    {
-                                        nameExp: groupNameRef.current.value,
-                                    },
-                                ])
-                            }
-                        }}
+                        onClick={
+                            group
+                                ? () => setGroup(!group)
+                                : handleDropDownAddVal
+                        }
                     >
                         {group ? '+Create new Group' : 'Add group'}
                     </button>
@@ -201,11 +239,17 @@ function Expenses() {
                         className="expInput expLeft"
                         placeholder="Name"
                         ref={nameRef}
+                        onChange={() => {
+                            nameRef.current.style.border = 'none'
+                        }}
                     />
                     <Form.Control
                         className="expInput expLeft"
                         placeholder="Price"
                         ref={priceRef}
+                        onChange={() => {
+                            priceRef.current.style.border = 'none'
+                        }}
                     />
                     <Form.Check className="expLeft expCheck" />
                 </div>
@@ -223,24 +267,43 @@ function Expenses() {
                         emptyColor="gray"
                     />
                 </div>
-                <button
-                    className="btn mainColor w-50"
-                    onClick={handleAddExpenses}
-                >
-                    Add List
-                </button>
+                {req ? (
+                    <Button
+                        className="btn mainColor w-50"
+                        onClick={handleAddExpenses}
+                    >
+                        Add List
+                    </Button>
+                ) : (
+                    <Button
+                        className="w-50 mainColor"
+                        variant="primary"
+                        disabled
+                    >
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                        />
+                        <span className="sr-only">Loading...</span>
+                    </Button>
+                )}
             </div>
 
             <div className="listt ">
                 <br />
                 <div
                     className="ag-theme-alpine"
-                    style={{ height: 400, width: 600 }}
+                    style={{ height: 400, width: 'auto' }}
                 >
                     <AgGridReact rowData={rowData}>
+                        <AgGridColumn field="group"></AgGridColumn>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
                         <AgGridColumn field="priority"></AgGridColumn>
+                        <AgGridColumn field="date"></AgGridColumn>
                     </AgGridReact>
                 </div>
             </div>
