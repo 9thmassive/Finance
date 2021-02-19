@@ -44,8 +44,10 @@ function Expenses() {
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
+    const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
-    const toDay = () => new Date().toLocaleDateString()
+    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    const thisTime = () => new Date().toLocaleTimeString()
 
     function userMessage(num, msg) {
         if (num === 1) {
@@ -94,30 +96,33 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        const getDat = await firebase
-            .firestore()
-            .collection('expenses')
-            .doc(uid)
-            .get()
-        let toDayData = getDat.data()[toDay()]
-        if (!getDat.data()?.[toDay()]) {
-            toDayData = []
-        }
+        // await firebase
+        //     .firestore()
+        //     .collection('expenses')
+        //     .doc(uid)
+        //     .set({
+        //         [toDay()]: {
+        //             group: selectedGroup,
+        //             name: nameRef.current.value,
+        //             value: priceRef.current.value,
+        //             priority: rating,
+        //         },
+        //     })
 
         await firebase
             .firestore()
             .collection('expenses')
             .doc(uid)
-            .set({
-                [toDay()]: [
-                    {
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        priority: rating,
-                    },
-                    ...toDayData,
-                ],
+            .update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    group: selectedGroup,
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    priority: rating,
+                    date: toDay() + thisTime(),
+                }),
             })
+
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
     }
@@ -128,42 +133,33 @@ function Expenses() {
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
-                setRowData(doc.data()?.[toDay()])
+                if (doc.data()?.[toDay()]) {
+                    setRowData(doc.data()?.[toDay()].reverse())
+                }
             })
     }, [])
 
     async function handleDropDownAddVal() {
-        console.log(dropVal)
-        // if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
-        //     return userMessage(
-        //         1,
-        //         '😕 The group has already been added, you cannot add twice'
-        //     )
-        // }
+        if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
+            return userMessage(
+                1,
+                '😕 The group has already been added, you cannot add twice'
+            )
+        }
         if (groupNameRef.current.value.length === 0) {
             return setGroup(!group)
-        }
-        const getDropData = await firebase
-            .firestore()
-            .collection('user')
-            .doc(uid)
-            .get()
-        let setDropDat = getDropData.data()?.dropdown
-        if (!setDropDat) {
-            setDropDat = []
         }
         await firebase
             .firestore()
             .collection('user')
             .doc(uid)
-            .set({
-                dropdown: [
-                    ...setDropDat,
-                    { nameExp: groupNameRef.current.value },
-                ],
+            .update({
+                dropdown: firebase.firestore.FieldValue.arrayUnion({
+                    nameExp: groupNameRef.current.value,
+                }),
             })
         setDropDownVal(groupNameRef.current.value)
-        setGroup(true)
+        setGroup((prev) => !prev)
         return userMessage(
             2,
             '😎 The new group has been successfully added to your account'
@@ -175,10 +171,12 @@ function Expenses() {
             .collection('user')
             .doc(uid)
             .onSnapshot((doc) => {
-                setDropVal((prev) => [...prev, doc.data()?.dropdown].flat())
-                console.log([...dropVal, doc.data()?.dropdown].flat())
+                if (doc.data()?.dropdown) {
+                    setDropVal([...dropVal, ...doc.data()?.dropdown])
+                }
             })
     }, [])
+
     return (
         <div className="container ">
             <div className="container ">
@@ -192,7 +190,12 @@ function Expenses() {
                                         className="drop-hover"
                                         as="button"
                                         onClick={(e) => {
-                                            setDropDownVal(e.target.outerText)
+                                            setDropDownVal(
+                                                () => e.target.outerText
+                                            )
+                                            setSelectedGroup(
+                                                () => e.target.outerText
+                                            )
                                         }}
                                     >
                                         {nameExp}
@@ -282,12 +285,14 @@ function Expenses() {
                 <br />
                 <div
                     className="ag-theme-alpine"
-                    style={{ height: 400, width: 600 }}
+                    style={{ height: 400, width: 'auto' }}
                 >
                     <AgGridReact rowData={rowData}>
+                        <AgGridColumn field="group"></AgGridColumn>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
                         <AgGridColumn field="priority"></AgGridColumn>
+                        <AgGridColumn field="date"></AgGridColumn>
                     </AgGridReact>
                 </div>
             </div>
