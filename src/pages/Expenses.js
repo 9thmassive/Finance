@@ -28,8 +28,15 @@ const expList = [
 ]
 
 function Expenses() {
-    toast.configure()
-    const uid = firebase.auth().currentUser?.uid
+  const [uid, setUid] = useState(null);
+    useEffect(() => {
+      firebase.auth().onAuthStateChanged(currentUser => {
+        setUid(currentUser?.uid);
+      })
+    },[])
+    toast.configure();
+
+    const [emptyData,setEmptyData] = useState(false)
 
     const [group, setGroup] = useState(false)
     const [rating, setRating] = useState(0)
@@ -83,6 +90,18 @@ function Expenses() {
             })
         }
     }
+    useEffect(()=>{
+      if(uid){
+        firebase.firestore()
+      .collection('expenses')
+      .doc(uid).get((doc)=>{
+            if(!doc.data()[toDay()]){
+              setEmptyData(!emptyData)
+            }
+      })
+      }
+
+    },[uid])
     //
     async function handleAddExpenses() {
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
@@ -95,35 +114,56 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        await firebase
-            .firestore()
-            .collection('expenses')
-            .doc(uid)
-            .update({
-                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                    group: selectedGroup,
-                    name: nameRef.current.value,
-                    value: priceRef.current.value,
-                    priority: rating,
-                    date: toDay() + thisTime(),
-                }),
+        if(emptyData){
+          await firebase
+          .firestore()
+          .collection('expenses')
+          .doc(uid)
+          .set({
+              [toDay()]:[{
+                group: selectedGroup,
+                name: nameRef.current.value,
+                value: priceRef.current.value,
+                priority: rating,
+                date: toDay() + thisTime(),
+            }]
+          })
+          setEmptyData((prev)=>!prev)
+        }else{
+          await firebase
+          .firestore()
+          .collection('expenses')
+          .doc(uid)
+          .update({
+              [toDay()]:firebase.firestore.FieldValue.arrayUnion({
+                group: selectedGroup,
+                name: nameRef.current.value,
+                value: priceRef.current.value,
+                priority: rating,
+                date: toDay() + thisTime(),
             })
+          })
+        }
+
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
     }
 
     useEffect(() => {
+      if(!uid) {
+        return
+      }
         firebase
             .firestore()
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
-                if (doc.data()?.[toDay()]) {
-                    setRowData(doc.data()?.[toDay()].reverse())
+                if (doc.data()[toDay()]) {
+                    setRowData(doc.data()[toDay()]);
                 }
             })
-    }, [])
+    },[uid]);
 
     async function handleDropDownAddVal() {
         if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
@@ -152,6 +192,9 @@ function Expenses() {
         )
     }
     useEffect(() => {
+      if(!uid) {
+        return
+      }
         firebase
             .firestore()
             .collection('user')
@@ -161,13 +204,13 @@ function Expenses() {
                     setDropVal([...dropVal, ...doc.data()?.dropdown])
                 }
             })
-    }, [])
+    }, [uid]);
 
     // async function getData() {
     //     // await firebase
     //     //     .firestore()
     //     //     .collection('expenses')
-    //     //     .doc(uid)
+    //     //     .doc(uid())
     //     //     .get((doc) => {
     //     //         setRowData(doc.data()?.[toDay()])
     //     //     })
@@ -175,7 +218,7 @@ function Expenses() {
     //     await firebase
     //         .firestore()
     //         .collection('user')
-    //         .doc(uid)
+    //         .doc(uid())
     //         .get((doc) => {
     //             setDropVal([...dropVal, ...doc.data()?.dropdown])
     //         })
