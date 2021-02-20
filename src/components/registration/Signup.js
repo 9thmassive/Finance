@@ -80,7 +80,7 @@ export default function Signup() {
                 .firestore()
                 .collection('user')
                 .doc(currentUser.uid)
-                .set({
+                .update({
                     displayName: currentUser.displayName,
                 })
 

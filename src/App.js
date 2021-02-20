@@ -26,30 +26,30 @@ function App() {
     const [expenses, setExpenses] = useState(null)
     useEffect(() => {
         firebase.auth().onAuthStateChanged((firebaseUser) => {
-            async function manageIncomeExpenses() {
-                const firestoreCurrentCollection = await firebase
-                    .firestore()
-                    .collection('income')
-                    .doc(firebaseUser.uid)
-                    .get()
+            // async function manageIncomeExpenses() {
+            //     const firestoreCurrentCollection = await firebase
+            //         .firestore()
+            //         .collection('income')
+            //         .doc(firebaseUser.uid)
+            //         .get()
 
-                if (firestoreCurrentCollection.exists) {
-                    firebase
-                        .firestore()
-                        .collection('income')
-                        .doc(firebaseUser.uid)
-                        .set({ incomeValue: 0, expensesValue: 0 })
-                } else {
-                }
-            }
+            //     if (firestoreCurrentCollection.exists) {
+            //         firebase
+            //             .firestore()
+            //             .collection('income')
+            //             .doc(firebaseUser.uid)
+            //             .set({ incomeValue: 0, expensesValue: 0 })
+            //     } else {
+            //     }
+            // }
             setUser(firebaseUser)
             if (firebaseUser) {
-                manageIncomeExpenses()
+                // manageIncomeExpenses()
                 firebase
                     .firestore()
                     .collection('user')
                     .doc(firebaseUser.uid)
-                    .set({
+                    .update({
                         displayName: firebaseUser.displayName,
                     })
             }

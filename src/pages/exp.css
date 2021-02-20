@@ -33,3 +33,23 @@
 #mainColor {
     background-color: #d65a31;
 }
+.ratingPriority {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    font-weight: 700;
+    border-radius: 100%;
+    justify-content: center;
+    border: solid 3px #eeeeee;
+    font-size: 20px;
+    color: #eeeeee;
+    cursor: pointer;
+}
+.headerTooltip {
+    background-color: #393e46;
+    color: #eeeeee;
+}
+#popover-basic {
+    height: auto;
+}
