@@ -4,10 +4,12 @@ import { DropdownButton, Dropdown, Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
 import firebase from 'firebase'
+import Swal from 'sweetalert2'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import './exp.css'
+import myGrupRemoveIcoN from './img/dropRemov.svg'
 //
 const expList = [
     {
@@ -45,13 +47,15 @@ function Expenses() {
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
     const [dropVal, setDropVal] = useState(expList)
     const [rowData, setRowData] = useState([])
+    const [fullData, setFullData] = useState()
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
     const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
-    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    const toDay = () =>
+        new Date().toLocaleDateString().split('/').join('-').toString()
     const thisTime = () => new Date().toLocaleTimeString()
 
     function userMessage(num, msg) {
@@ -142,7 +146,7 @@ function Expenses() {
                         name: nameRef.current.value,
                         value: priceRef.current.value,
                         priority: rating,
-                        date: toDay() + thisTime(),
+                        date: toDay() + ' - ' + thisTime(),
                     }),
                 })
         }
@@ -202,10 +206,75 @@ function Expenses() {
             .doc(uid)
             .onSnapshot((doc) => {
                 if (doc.data()?.dropdown) {
-                    setDropVal([...dropVal, ...doc.data()?.dropdown])
+                    setDropVal(() => [...dropVal, ...doc.data()?.dropdown])
+                    //remove dubllicate from dropdown data
+                    setDropVal((prev) =>
+                        prev.filter(
+                            (v, i, a) =>
+                                a.findIndex((t) => t.nameExp === v.nameExp) ===
+                                i
+                        )
+                    )
                 }
             })
     }, [uid])
+    async function handleRemoveGroup(e) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text:
+                'If you delete then all information on this group is deleted.!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            const targetGroup = e.target.parentNode.innerHTML.split('<')[0]
+            if (result.isConfirmed) {
+                await firebase
+                    .firestore()
+                    .collection('expenses')
+                    .doc(uid)
+                    .onSnapshot((doc) => {
+                        setFullData(() => doc.data())
+                    })
+
+                let filteredObj = fullData
+
+                for (let j in filteredObj) {
+                    let objVal = filteredObj[j]
+                    objVal = objVal.filter(({ group }) => group !== targetGroup)
+                    filteredObj[j] = objVal
+                }
+                await setFullData((prev) => (prev = filteredObj))
+                
+                await firebase
+                    .firestore()
+                    .collection('expenses')
+                    .doc(uid)
+                    .update(fullData)
+
+                await firebase
+                    .firestore()
+                    .collection('user')
+                    .doc(uid)
+                    .get((doc) => {
+                        if (doc.data()?.dropDown) {
+                            setDropVal(doc.data().dropDown)
+                        }
+                    })
+                let filteredDrop = dropVal
+                filteredDrop = filteredDrop.filter(
+                    ({ nameExp }) => nameExp !== targetGroup
+                )
+                await setDropVal(() => filteredDrop)
+                await setDropDownVal((prev) => (prev = 'Car Payment'))
+                userMessage(1, '🥺  Deleted!  Your file has been deleted.')
+                // Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
+            }
+        })
+    }
+
     const popover = (
         <Popover id="popover-basic">
             <Popover.Title as="h3" className="headerTooltip">
@@ -214,6 +283,7 @@ function Expenses() {
             <Popover.Content>How important is your spending?</Popover.Content>
         </Popover>
     )
+
     return (
         <div className="container ">
             <div className="container ">
@@ -235,7 +305,19 @@ function Expenses() {
                                             )
                                         }}
                                     >
-                                        {nameExp}
+                                        <p className="dropDownData">
+                                            {nameExp}
+                                            {!expList.find(
+                                                ({ nameExp: val }) =>
+                                                    val === nameExp
+                                            ) ? (
+                                                <img
+                                                    onClick={handleRemoveGroup}
+                                                    className="remove_group_dropdown"
+                                                    src={myGrupRemoveIcoN}
+                                                />
+                                            ) : null}
+                                        </p>
                                     </Dropdown.Item>
                                 )
                             })}

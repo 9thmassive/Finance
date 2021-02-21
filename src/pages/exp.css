@@ -53,3 +53,11 @@
 #popover-basic {
     height: auto;
 }
+.remove_group_dropdown {
+    width: 25px;
+}
+.dropDownData {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
