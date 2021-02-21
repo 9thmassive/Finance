@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Spinner } from 'react-bootstrap'
+import { Button, Spinner, OverlayTrigger, Popover } from 'react-bootstrap'
 import { DropdownButton, Dropdown, Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -8,7 +8,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import './exp.css'
-
+//
 const expList = [
     {
         nameExp: 'Auto insurance.',
@@ -26,17 +26,17 @@ const expList = [
         nameExp: 'Utility',
     },
 ]
+toast.configure()
 
 function Expenses() {
-  const [uid, setUid] = useState(null);
+    const [uid, setUid] = useState(null)
     useEffect(() => {
-      firebase.auth().onAuthStateChanged(currentUser => {
-        setUid(currentUser?.uid);
-      })
-    },[])
-    toast.configure();
+        firebase.auth().onAuthStateChanged((currentUser) => {
+            setUid(currentUser?.uid)
+        })
+    }, [])
 
-    const [emptyData,setEmptyData] = useState(false)
+    const [emptyData, setEmptyData] = useState(false)
 
     const [group, setGroup] = useState(false)
     const [rating, setRating] = useState(0)
@@ -54,7 +54,6 @@ function Expenses() {
     const toDay = () => new Date().toLocaleDateString().split('/').join('-')
     const thisTime = () => new Date().toLocaleTimeString()
 
-    // alert(rowData.length)
     function userMessage(num, msg) {
         if (num === 1) {
             return toast.info(msg, {
@@ -90,18 +89,19 @@ function Expenses() {
             })
         }
     }
-    useEffect(()=>{
-      if(uid){
-        firebase.firestore()
-      .collection('expenses')
-      .doc(uid).get((doc)=>{
-            if(!doc.data()[toDay()]){
-              setEmptyData(!emptyData)
-            }
-      })
-      }
-
-    },[uid])
+    useEffect(() => {
+        if (uid) {
+            firebase
+                .firestore()
+                .collection('expenses')
+                .doc(uid)
+                .get((doc) => {
+                    if (!doc.data()[toDay()]) {
+                        setEmptyData(!emptyData)
+                    }
+                })
+        }
+    }, [uid])
     //
     async function handleAddExpenses() {
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
@@ -114,56 +114,57 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        if(emptyData){
-          await firebase
-          .firestore()
-          .collection('expenses')
-          .doc(uid)
-          .set({
-              [toDay()]:[{
-                group: selectedGroup,
-                name: nameRef.current.value,
-                value: priceRef.current.value,
-                priority: rating,
-                date: toDay() + thisTime(),
-            }]
-          })
-          setEmptyData((prev)=>!prev)
-        }else{
-          await firebase
-          .firestore()
-          .collection('expenses')
-          .doc(uid)
-          .update({
-              [toDay()]:firebase.firestore.FieldValue.arrayUnion({
-                group: selectedGroup,
-                name: nameRef.current.value,
-                value: priceRef.current.value,
-                priority: rating,
-                date: toDay() + thisTime(),
-            })
-          })
+        if (emptyData) {
+            await firebase
+                .firestore()
+                .collection('expenses')
+                .doc(uid)
+                .set({
+                    [toDay()]: [
+                        {
+                            group: selectedGroup,
+                            name: nameRef.current.value,
+                            value: priceRef.current.value,
+                            priority: rating,
+                            date: toDay() + thisTime(),
+                        },
+                    ],
+                })
+            setEmptyData((prev) => !prev)
+        } else {
+            await firebase
+                .firestore()
+                .collection('expenses')
+                .doc(uid)
+                .update({
+                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                        group: selectedGroup,
+                        name: nameRef.current.value,
+                        value: priceRef.current.value,
+                        priority: rating,
+                        date: toDay() + thisTime(),
+                    }),
+                })
         }
-
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
     }
 
     useEffect(() => {
-      if(!uid) {
-        return
-      }
+        if (!uid) {
+            return
+        }
         firebase
             .firestore()
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
                 if (doc.data()[toDay()]) {
-                    setRowData(doc.data()[toDay()]);
+                    setRowData(doc.data()[toDay()].reverse())
                 }
             })
-    },[uid]);
+    }, [uid])
 
     async function handleDropDownAddVal() {
         if (dropVal.find((el) => el.nameExp === groupNameRef.current.value)) {
@@ -192,9 +193,9 @@ function Expenses() {
         )
     }
     useEffect(() => {
-      if(!uid) {
-        return
-      }
+        if (!uid) {
+            return
+        }
         firebase
             .firestore()
             .collection('user')
@@ -204,27 +205,15 @@ function Expenses() {
                     setDropVal([...dropVal, ...doc.data()?.dropdown])
                 }
             })
-    }, [uid]);
-
-    // async function getData() {
-    //     // await firebase
-    //     //     .firestore()
-    //     //     .collection('expenses')
-    //     //     .doc(uid())
-    //     //     .get((doc) => {
-    //     //         setRowData(doc.data()?.[toDay()])
-    //     //     })
-
-    //     await firebase
-    //         .firestore()
-    //         .collection('user')
-    //         .doc(uid())
-    //         .get((doc) => {
-    //             setDropVal([...dropVal, ...doc.data()?.dropdown])
-    //         })
-    // }
-    // getData()
-
+    }, [uid])
+    const popover = (
+        <Popover id="popover-basic">
+            <Popover.Title as="h3" className="headerTooltip">
+                Popover right
+            </Popover.Title>
+            <Popover.Content>How important is your spending?</Popover.Content>
+        </Popover>
+    )
     return (
         <div className="container ">
             <div className="container ">
@@ -303,6 +292,13 @@ function Expenses() {
                         fillColor="orange"
                         emptyColor="gray"
                     />
+                    <OverlayTrigger
+                        trigger="hover"
+                        placement="right"
+                        overlay={popover}
+                    >
+                        <p className="ratingPriority">?</p>
+                    </OverlayTrigger>
                 </div>
                 {req ? (
                     <Button
