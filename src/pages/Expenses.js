@@ -145,7 +145,7 @@ function Expenses() {
                         name: nameRef.current.value,
                         value: priceRef.current.value,
                         priority: rating,
-                        date: toDay() + thisTime(),
+                        date: toDay() + ' - ' + thisTime(),
                     }),
                 })
         }
@@ -237,18 +237,38 @@ function Expenses() {
                     .onSnapshot((doc) => {
                         setFullData(() => doc.data())
                     })
-                setFullData((p) => JSON.stringify(p))
-                console.log(fullData)
-                let cleanData = []
-                // fullData.forEach((date) => {
-                //     date.forEach(({ group, index }) => {
-                //         if (group === targetGroup) {
-                //             delete date[index]
-                //         }
-                //     })
-                // })
 
-                Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
+                let filteredObj = fullData
+                for (let j in filteredObj) {
+                    filteredObj[j] = filteredObj[j].filter(
+                        ({ group }) => group !== targetGroup
+                    )
+                }
+                await setFullData((prev) => (prev = filteredObj))
+
+                await firebase
+                    .firestore()
+                    .collection('expenses')
+                    .doc(uid)
+                    .update(fullData)
+
+                await firebase
+                    .firestore()
+                    .collection('user')
+                    .doc(uid)
+                    .get((doc) => {
+                        if (doc.data()?.dropDown) {
+                            setDropVal(doc.data().dropDown)
+                        }
+                    })
+                let filteredDrop = dropVal
+                filteredDrop = filteredDrop.filter(
+                    ({ nameExp }) => nameExp !== targetGroup
+                )
+                await setDropVal(() => filteredDrop)
+                await setDropDownVal((prev) => (prev = 'Car Payment'))
+                userMessage(1, '🥺  Deleted!  Your file has been deleted.')
+                // Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
             }
         })
     }
