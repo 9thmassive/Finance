@@ -9,7 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import './exp.css'
-import myGrupRemoveIcoN from './img/dropRemov.svg'
+// import myGrupRemoveIcoN from './img/dropRemov.svg'
 //
 const expList = [
     {
@@ -289,11 +289,12 @@ function Expenses() {
                                                 ({ nameExp: val }) =>
                                                     val === nameExp
                                             ) ? (
-                                                <img
-                                                    onClick={handleRemoveGroup}
-                                                    className="remove_group_dropdown"
-                                                    src={myGrupRemoveIcoN}
-                                                />
+                                              null
+                                                // <img
+                                                //     onClick={handleRemoveGroup}
+                                                //     className="remove_group_dropdown"
+                                                //     src={myGrupRemoveIcoN}
+                                                // />
                                             ) : null}
                                         </p>
                                     </Dropdown.Item>

@@ -36,15 +36,6 @@ function App() {
                     .collection('income')
                     .doc(firebaseUser.uid)
                     .get()
-
-                if (firestoreCurrentCollection.exists) {
-                    firebase
-                        .firestore()
-                        .collection('income')
-                        .doc(firebaseUser.uid)
-                        .set({ incomeValue: 0, expensesValue: 0 })
-                } else {
-                }
             }
             setUser(firebaseUser)
             if (firebaseUser) {
