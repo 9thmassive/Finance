@@ -54,8 +54,10 @@ function Expenses() {
     const priceRef = useRef()
     const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
+
     const toDay = () =>
         new Date().toLocaleDateString().split('/').join('-').toString()
+
     const thisTime = () => new Date().toLocaleTimeString()
 
     function userMessage(num, msg) {
@@ -241,13 +243,18 @@ function Expenses() {
 
                 let filteredObj = fullData
 
+
+               
+                
+
                 for (let j in filteredObj) {
-                    let objVal = filteredObj[j]
-                    objVal = objVal.filter(({ group }) => group !== targetGroup)
-                    filteredObj[j] = objVal
+                    filteredObj[j] = filteredObj[j].filter(
+                        ({ group }) => group !== targetGroup
+                    )
                 }
                 await setFullData((prev) => (prev = filteredObj))
-                
+
+
                 await firebase
                     .firestore()
                     .collection('expenses')
