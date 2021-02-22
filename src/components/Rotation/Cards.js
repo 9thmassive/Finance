@@ -6,7 +6,11 @@ import wallet from './icons/wallet.svg'
 import firebase from 'firebase'
 
 export default function Cards() {
-    const [expenses, setExpenses ]= useState(0);
+
+    const [expenses, setExpenses ]= useState(254000)
+
+
+
     const [income,setIncome] = useState(345000)
     const [balanc,setBalanc] = useState(income-expenses)
     const uid = firebase.auth().currentUser?.uid
@@ -29,7 +33,28 @@ export default function Cards() {
     ]
 
 
-    // useEffect(
+
+    useEffect(
+        async ()=>{
+
+            let  expDat = await firebase
+                .firestore()
+                .collection('expenses')
+                .doc(uid)
+                .get((doc)=>{
+                    expDat = doc.data()
+                })
+            console.log(expDat)
+            // console.log(expDat?.data())
+            // if(!expDat.data()){
+            //     expDat = Object.values(expDat.data())[0]
+            //     expDat = expDat.reduce((b,{value})=>+value+b,0)
+            //     setExpenses(()=>expDat)
+            //     setBalanc(()=>income-expenses)
+            // }
+
+        },[])
+          // useEffect(
     //     async ()=>{
 
     //         let  expDat = await firebase
@@ -44,6 +69,9 @@ export default function Cards() {
     //         setExpenses(()=>expDat)
     //         setBalanc(()=>income-expenses)
     //     },[])
+
+    
+
     return (
         <div className="cart-container">
             {cardInfo.map(({ money, type, icon }, index) => {

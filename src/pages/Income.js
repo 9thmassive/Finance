@@ -7,18 +7,30 @@ import firebase from 'firebase'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import './exp.css'
+import './inc.css'
 toast.configure()
 
 function Income() {
-    const [uid, setUid] = useState(null)
+    const [uid, setUid] = useState(null);
+    const [incomeData, setIncomeData] = useState([]);
+    useEffect(() => {
+      if(uid === null) {
+        return
+      }
+      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+        let currentData = doc.data();
+        let dataResult = [];
+        for(let data of Object.values(currentData)) {
+          dataResult = [...data, ...dataResult]
+        }
+        setIncomeData(dataResult);
+      })
+    },[uid])
     useEffect(() => {
         firebase.auth().onAuthStateChanged((currentUser) => {
             setUid(currentUser?.uid)
         })
     }, []);
-    useEffect(() => {
-      console.log(uid)
-    },[uid])
 
     const [emptyData, setEmptyData] = useState(false)
 
@@ -35,7 +47,7 @@ function Income() {
     //-------------------
 
     const toDay = () => new Date().toLocaleDateString().split('/').join('-')
-    const thisTime = () => new Date().toLocaleTimeString()
+    const thisTime = () => ' - ' + new Date().toLocaleTimeString()
 
     function userMessage(num, msg) {
         if (num === 1) {
@@ -86,19 +98,19 @@ function Income() {
         }
     }, [uid]);
 
-    useEffect(() => {
-      if(!uid) return;
-      firebase.firestore().collection('income').doc(uid).get(doc => {
-        let currentData = [];
-        for(let data of Object.value(doc.data())) {
-          currentData = [...currentData, ...data];
-        }
-        setRowData(currentData);
-      })
-    },[uid]);
+    // useEffect(() => {
+    //   if(!uid) return;
+    //   firebase.firestore().collection('income').doc(uid).get(doc => {
+    //     let currentData = [];
+    //     for(let data of Object.values(doc.data())) {
+    //       currentData = [...currentData, ...data];
+    //     }
+    //     setRowData(currentData);
+    //   })
+    // },[uid]);
     //
 
-    async function handleAddExpenses() {
+    async function handleAddIncome() {
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
             priceRef.current.style.border = 'red solid 3px'
 
@@ -110,43 +122,44 @@ function Income() {
         }
         setReq((prev) => !prev)
 
-        // if (emptyData) {
-        //     await firebase
-        //         .firestore()
-        //         .collection('income')
-        //         .doc(uid)
-        //         .set({
-        //             [toDay()]: [
-        //                 {
-        //                     name: nameRef.current.value,
-        //                     value: priceRef.current.value,
-        //                     date: toDay() + thisTime(),
-        //                 },
-        //             ],
-        //         })
-        //     setEmptyData((prev) => !prev)
-        // } else {
-        //     await firebase
-        //         .firestore()
-        //         .collection('income')
-        //         .doc(uid)
-        //         .update({
-        //             [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-        //                 name: nameRef.current.value,
-        //                 value: priceRef.current.value,
-        //                 date: toDay() + thisTime(),
-        //             }),
-        //         })
-        // }
+
+        if (emptyData) {
+            await firebase
+                .firestore()
+                .collection('income')
+                .doc(uid)
+                .set({
+                    [toDay()]: [
+                        {
+                            name: nameRef.current.value,
+                            value: priceRef.current.value,
+                            date: toDay() + thisTime(),
+                        },
+                    ],
+                })
+            setEmptyData((prev) => !prev)
+        } else {
+            await firebase
+                .firestore()
+                .collection('income')
+                .doc(uid)
+                .update({
+                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                        name: nameRef.current.value,
+                        value: priceRef.current.value,
+                        date: toDay() + thisTime(),
+                    }),
+                })
+        }
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
     }
 
     return (
-        <div className="container ">
+        <div className="container">
             <div className="container ">
-                <div className="add namPrice">
+                <div className="add namPrice incomeData">
                     <Form.Control
                         className="expInput expLeft"
                         placeholder="Name"
@@ -165,10 +178,13 @@ function Income() {
                     />
                 </div>
                 <br/>
+                <div className="incomeData">
+
+
                 {req ? (
                     <Button
                         className="btn mainColor w-50"
-                        onClick={handleAddExpenses}
+                        onClick={handleAddIncome}
                     >
                         Add List
                     </Button>
@@ -188,15 +204,17 @@ function Income() {
                         <span className="sr-only">Loading...</span>
                     </Button>
                 )}
+                </div>
             </div>
+            <br/>
 
-            <div className="listt ">
+            <div className="listt incomeData">
                 <br />
                 <div
                     className="ag-theme-alpine"
-                    style={{ height: 400, width: 'auto' }}
+                    style={{ height: 400, width: 600 }}
                 >
-                    <AgGridReact rowData={rowData}>
+                    <AgGridReact rowData={incomeData}>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
                         <AgGridColumn field="date"></AgGridColumn>
@@ -207,3 +225,4 @@ function Income() {
     )
 }
 export default Income
+

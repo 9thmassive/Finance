@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
+import myGrupRemoveIcoN from './img/dropRemov.svg'
 import './exp.css'
 // import myGrupRemoveIcoN from './img/dropRemov.svg'
 //
@@ -46,15 +47,21 @@ function Expenses() {
 
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
     const [dropVal, setDropVal] = useState(expList)
+    const [filterDrop,setFilterDrop] = useState()
+    //------------------
     const [rowData, setRowData] = useState([])
-    const [fullData, setFullData] = useState()
+    const [fullData, setFullData] = useState();
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
     const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
-    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    const[targetGroup,setTargetGroup] = useState()
+
+    const toDay = () =>
+        new Date().toLocaleDateString().split('/').join('-').toString()
+
     const thisTime = () => new Date().toLocaleTimeString()
 
     function userMessage(num, msg) {
@@ -104,7 +111,9 @@ function Expenses() {
                     }
                 })
         }
-    }, [uid])
+    }, [uid]);
+
+
     //
     async function handleAddExpenses() {
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
@@ -145,7 +154,7 @@ function Expenses() {
                         name: nameRef.current.value,
                         value: priceRef.current.value,
                         priority: rating,
-                        date: toDay() + thisTime(),
+                        date: toDay() + ' - ' + thisTime(),
                     }),
                 })
         }
@@ -227,31 +236,44 @@ function Expenses() {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',
-        }).then(async (result) => {
-            const targetGroup = e.target.parentNode.innerHTML.split('<')[0]
-            if (result.isConfirmed) {
-                await firebase
-                    .firestore()
-                    .collection('expenses')
-                    .doc(uid)
-                    .onSnapshot((doc) => {
-                        setFullData(() => doc.data())
-                    })
-                setFullData((p) => JSON.stringify(p))
-                console.log(fullData)
-                let cleanData = []
-                // fullData.forEach((date) => {
-                //     date.forEach(({ group, index }) => {
-                //         if (group === targetGroup) {
-                //             delete date[index]
-                //         }
-                //     })
-                // })
+        }).then( (result) => {
+          setTargetGroup(   e.target.parentNode.innerHTML.split('<')[0])
 
-                Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
+            if (result.isConfirmed) {
+
+                firebase.firestore().collection('expenses').doc(uid).get().then((doc)=>{
+                  setFullData((prev)=>prev = doc.data())
+                },)
+
+                firebase.firestore().collection('user').doc(uid).get().then((doc)=>{
+                  setFilterDrop(doc.data().dropdown)
+
+                  console.log(doc.data())
+                },)
+
             }
         })
     }
+    useEffect(()=>{
+        if(filterDrop){
+          let data = filterDrop.filter(({nameExp})=>nameExp!=targetGroup)
+          firebase.firestore().collection('user').doc(uid).set({dropdown:data})
+          console.log(filterDrop,'effect')
+          setDropVal([...expList,...data])
+        }
+
+    },[filterDrop])
+
+    useEffect(() => {
+      if(fullData){
+        let filteredData = fullData
+        for(let arr in filteredData){
+          filteredData[arr] = filteredData[arr].filter(({group})=>group!==targetGroup)
+        }
+        firebase.firestore().collection('expenses').doc(uid).set({...filteredData})
+
+      }
+    },[fullData]);
 
     const popover = (
         <Popover id="popover-basic">
@@ -289,12 +311,11 @@ function Expenses() {
                                                 ({ nameExp: val }) =>
                                                     val === nameExp
                                             ) ? (
-                                              null
-                                                // <img
-                                                //     onClick={handleRemoveGroup}
-                                                //     className="remove_group_dropdown"
-                                                //     src={myGrupRemoveIcoN}
-                                                // />
+                                                <img
+                                                    onClick={handleRemoveGroup}
+                                                    className="remove_group_dropdown"
+                                                    src={myGrupRemoveIcoN}
+                                                />
                                             ) : null}
                                         </p>
                                     </Dropdown.Item>

@@ -1,23 +1,15 @@
-//import { IconName } from 'react-icons/io';
-//import { IconName } from 'react-icons/fa';
 import React, { useState } from 'react'
 import firebase from 'firebase'
-import * as FaIcons from 'react-icons/fa'
-import * as AiIcons from 'react-icons/ai'
-import * as GrIcons from 'react-icons/gr'
 import { Link, NavLink } from 'react-router-dom'
 import { SidebarData } from './SidebarData'
 import './Navbar.css'
 import { IconContext } from 'react-icons'
-import Logo from './../leadingPage_proto/dist/images/logo.png'
-
+import Logo from './../leadingPage/dist/images/logo.png'
+import { nanoid } from 'nanoid'
 function Navbar() {
     const [sidebar, setSidebar] = useState(false)
-
     const showSidebar = () => setSidebar(!sidebar)
-
     const [isShown, setIsShown] = useState(false)
-
     return (
         <>
             <IconContext.Provider value={{ color: '#fff' }}>
@@ -34,7 +26,6 @@ function Navbar() {
                     </button>
                     <Link to="#" className="menu-bars"></Link>
                 </div>
-
                 <nav
                     className={!sidebar ? 'nav-menu active' : 'nav-menu'}
                     onMouseEnter={() => setIsShown(true)}
@@ -43,12 +34,10 @@ function Navbar() {
                     <ul className="nav-menu-items ulCl" onClick={showSidebar}>
                         {SidebarData.map((item, index) => {
                             return (
-                                <>
+                                <React.Fragment key={nanoid()}>
                                     <NavLink
-                                        key={index}
                                         className={`${item.cName} pos`}
                                         to={item.path}
-                                       
                                         activeClassName="activeLink"
                                     >
                                         {item.icon}
@@ -58,7 +47,7 @@ function Navbar() {
                                             </span>
                                         )}
                                     </NavLink>
-                                </>
+                                </React.Fragment>
                             )
                         })}
                     </ul>
@@ -67,5 +56,4 @@ function Navbar() {
         </>
     )
 }
-
 export default Navbar

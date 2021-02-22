@@ -1,19 +1,20 @@
 import firebase from 'firebase'
 import './App.css'
 import { useState, useEffect } from 'react'
-// import Header from './components/Header'
 import Login from './components/registration/Login'
-
 import Signup from './components/registration/Signup'
 import User from './components/Rotation/User'
 import ForgotPassword from './components/registration/ForgotPassword'
 import Navbar from './components/NavBar/Navbar'
+
+import LeadingPage from './components/leadingPage/LeadingPage'
+
 import MainDeposit from './components/Deposit/MainDeposit'
-import LeadingPage from './components/leadingPage_proto/LeadingPage'
+
+
 import Transaction from './pages/Transaction'
 import Income from './pages/Income'
 import Expenses from './pages/Expenses'
-// import LeadingPage from './components/LeadingPage/LeadingPage'
 import FindSaving from './components/findSaving/FindSaving'
 import Profile from './components/profile/Profile'
 import Dashboard from './components/Rotation/Dashboard'
@@ -37,14 +38,30 @@ function App() {
                     .doc(firebaseUser.uid)
                     .get()
             }
+            // async function manageIncomeExpenses() {
+            //     const firestoreCurrentCollection = await firebase
+            //         .firestore()
+            //         .collection('income')
+            //         .doc(firebaseUser.uid)
+            //         .get()
+
+            //     if (firestoreCurrentCollection.exists) {
+            //         firebase
+            //             .firestore()
+            //             .collection('income')
+            //             .doc(firebaseUser.uid)
+            //             .set({ incomeValue: 0, expensesValue: 0 })
+            //     } else {
+            //     }
+            // }
             setUser(firebaseUser)
             if (firebaseUser) {
-                manageIncomeExpenses()
+                // manageIncomeExpenses()
                 firebase
                     .firestore()
                     .collection('user')
                     .doc(firebaseUser.uid)
-                    .set({
+                    .update({
                         displayName: firebaseUser.displayName,
                     })
             }

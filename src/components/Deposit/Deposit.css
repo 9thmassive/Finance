@@ -1,36 +1,36 @@
-html {
+/* html {
     font-size: 17px;
   }
-  
+
   body {
     font-family: "Nunito", sans-serif;
   }
-  
+
   p {
     font-size: 2rem;
     margin-bottom: -10px !important;
     color: #d48f78;
   }
-  
+
   h4 {
     font-size: 1.5rem;
   }
-  
+
   small {
     font-weight: lighter;
     color: #d48f78;
     margin: 0;
     font-size: 17px;
   }
-  
+
   .flex {
     padding-top: 15px;
     display: flex;
     justify-content: space-between;
   }
-  
+
   .App2 {
-    background-color: #222831; /*#222831*/ /*#393e46;*/
+    background-color: #222831;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -41,17 +41,16 @@ html {
     margin: 20vh auto;
     box-shadow: 15px 20px 70px -10px;
     color: #d48f78;
-   /*#d48f78*/ /*#d65a31*/
   }
-  
+
   .input-range__label--max {
     display: none;
   }
-  
+
   .input-range__label--min {
     display: none;
   }
-  
+
   .input-range__label-container {
     left: -50%;
     position: relative;
@@ -80,4 +79,4 @@ html {
   top: 50%;
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   width: 1rem;
-}
+} */
