@@ -9,8 +9,8 @@ import "react-input-range/lib/css/index.css";
 
 class MainDeposit extends Component {
   state = {
-    amountValue: 9000,
-    yearsValue: 1
+    amountValue: 10000,
+    yearsValue: 0.5,
   };
 
   handleAmountChange = value => {
@@ -25,11 +25,11 @@ class MainDeposit extends Component {
 
     return (
        <div className="App2">
-        <h4 >I want to borrow €{amountValue}</h4>
+        <h4 >I want to invest €{amountValue}</h4>
         <InputRange
           step={100}
-          maxValue={20000}
-          minValue={1000}
+          maxValue={10000}
+          minValue={200}
           value={amountValue}
           onChange={this.handleAmountChange}
         />
@@ -39,7 +39,7 @@ class MainDeposit extends Component {
         <InputRange
           step={0.5}
           maxValue={5}
-          minValue={1}
+          minValue={0.5}
           value={yearsValue}
           onChange={this.handleYearChange}
         />

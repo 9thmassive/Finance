@@ -20,16 +20,16 @@ class Deposit extends Component {
   calculateAPR = () => {
     const { amount } = this.props;
 
-    if (1000 < amount && amount < 5000) {
+    if (200 < amount && amount < 1000) {
       this.setState({ APR: 0.05 });
     }
-    if (5000 < amount && amount < 10000) {
+    if (1000 < amount && amount < 2000) {
       this.setState({ APR: 0.1 });
     }
-    if (10000 < amount && amount < 15000) {
+    if (2000 < amount && amount < 5000) {
       this.setState({ APR: 0.15 });
     }
-    if (15000 < amount && amount < 20000) {
+    if (5000 < amount && amount < 10000) {
       this.setState({ APR: 0.2 });
     }
   };
@@ -51,10 +51,10 @@ class Deposit extends Component {
   render() {
     return (
       <div className="flex">
-        <DepositChild func={this.percentageAPR()} text="interest rate" />
+        <DepositChild func={this.percentageAPR()} text="possible rate" />
         <DepositChild
           func={this.calculateMonthlyRepayment()}
-          text=" monthly repayment"
+          text=" monthly reward"
         />
       </div>
     );

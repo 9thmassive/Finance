@@ -105,6 +105,9 @@ function App() {
                     <Route exact path="/find-saving">
                         <FindSaving />
                     </Route>
+                    <Route exact path="/calculator">
+                      <MainDeposit/>
+                    </Route>
                 </Switch>
             </Router>
         </div>

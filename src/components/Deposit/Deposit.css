@@ -14,11 +14,11 @@
 
   h4 {
     font-size: 1.5rem;
-  }
+  }*/
 
   small {
     font-weight: lighter;
-    color: #d48f78;
+    color: white;
     margin: 0;
     font-size: 17px;
   }
@@ -40,7 +40,7 @@
     width: 20rem;
     margin: 20vh auto;
     box-shadow: 15px 20px 70px -10px;
-    color: #d48f78;
+    color: white;
   }
 
   .input-range__label--max {
@@ -79,4 +79,4 @@
   top: 50%;
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   width: 1rem;
-} */
+}
