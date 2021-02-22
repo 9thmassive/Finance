@@ -58,11 +58,13 @@ body {
     height: 100vh;
     display: flex;
     /*justify-content: center;*/
-    position: fixed;
+    position: absolute;
     top: 0;
     /* left: 100%; */
     transition: 850ms;
     margin-top: 82px;
+    z-index: 2;
+
 }
 
 .nav-menu.active {
@@ -72,7 +74,7 @@ body {
 .nav-menu:hover {
     left: 0;
     transition: 350ms;
-    width: 240px;
+    width: 180px;
 }
 .nav-text {
     display: flex;

@@ -1,6 +1,6 @@
 .add {
-    padding: 10px;
-    display: flex;
+  padding:10px;
+  display: flex;
 }
 .expLeft {
     margin-left: 10px;
@@ -60,4 +60,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+.container{
+  margin-left: 100px
+}
+.ag-theme-alpine{
+  margin-left: 65px
 }

@@ -287,7 +287,7 @@ function Expenses() {
     return (
         <div className="container ">
             <div className="container ">
-                <div className="container add">
+                <div className=" add">
                     {group ? (
                         <DropdownButton id="mainColor" title={dropDownVal}>
                             {dropVal.map(({ nameExp }, index) => {
@@ -411,9 +411,9 @@ function Expenses() {
                 <br />
                 <div
                     className="ag-theme-alpine"
-                    style={{ height: 400, width: 'auto' }}
+                    style={{ height: 300, width: 'auto' }}
                 >
-                    <AgGridReact rowData={rowData}>
+                    <AgGridReact rowData={rowData} >
                         <AgGridColumn field="group"></AgGridColumn>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
