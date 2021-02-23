@@ -1,128 +1,14 @@
-import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts'
+import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts';
 const data = [
     {
         name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2000,
-        Out: 1500,
-    },
-    {
-        name: 'Jun',
-        In: 2000,
-        Out: 5400,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2000,
-        Out: 1500,
-    },
-    {
-        name: 'Jun',
-        In: 2000,
-        Out: 5400,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 5500,
-        Out: 6000,
-    },
-    {
-        name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2600,
-        Out: 500,
-    },
-    {
-        name: 'Jun',
-        In: 3000,
-        Out: 1000,
-    },
-    {
-        name: 'July',
-        In: 800,
-        Out: 400,
-    },
-    {
-        name: 'Ougust',
-        In: 6500,
-        Out: 1000,
-    },
-    {
-        name: 'July',
-        In: 2800,
-        Out: 4400,
-    },
-    {
-        name: 'Ougust',
-        In: 1500,
-        Out: 2000,
+        inc: 1200,
+        exp: 1300,
     },
 ]
 
 export default function App() {
+
     return (
         <div className="linerChart-container">
             <AreaChart
@@ -156,14 +42,14 @@ export default function App() {
                 <Tooltip />
                 <Area
                     type="monotone"
-                    dataKey="In"
+                    dataKey="Out"
                     stroke="#8884d8"
                     fillOpacity={1}
                     fill="url(#colorUv)"
                 />
                 <Area
                     type="monotone"
-                    dataKey="Out"
+                    dataKey="In"
                     stroke="#82ca9d"
                     fillOpacity={1}
                     fill="url(#colorPv)"

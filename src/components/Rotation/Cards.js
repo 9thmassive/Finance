@@ -44,14 +44,6 @@ export default function Cards() {
                 .get((doc)=>{
                     expDat = doc.data()
                 })
-            console.log(expDat)
-            // console.log(expDat?.data())
-            // if(!expDat.data()){
-            //     expDat = Object.values(expDat.data())[0]
-            //     expDat = expDat.reduce((b,{value})=>+value+b,0)
-            //     setExpenses(()=>expDat)
-            //     setBalanc(()=>income-expenses)
-            // }
 
         },[])
           // useEffect(
@@ -70,7 +62,7 @@ export default function Cards() {
     //         setBalanc(()=>income-expenses)
     //     },[])
 
-    
+
 
     return (
         <div className="cart-container">
