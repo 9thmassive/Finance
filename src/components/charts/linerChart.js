@@ -65,7 +65,8 @@ export default function App() {
     }).sort((a,b) => {
       return +a.name.split('-')[1] - +b.name.split('-')[1]
     });
-    console.log(mergeResult)
+    setMergeIncomeExpense(mergeResult)
+
  },[income, expense]);
  useEffect(() => {
   console.log(expense)
@@ -76,7 +77,7 @@ export default function App() {
             <AreaChart
                 width={730}
                 height={250}
-                data={data}
+                data={mergeIncomeExpense}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 className="linerChartPosition"
             >
@@ -104,14 +105,14 @@ export default function App() {
                 <Tooltip />
                 <Area
                     type="monotone"
-                    dataKey="Out"
+                    dataKey="expense"
                     stroke="#8884d8"
                     fillOpacity={1}
                     fill="url(#colorUv)"
                 />
                 <Area
                     type="monotone"
-                    dataKey="In"
+                    dataKey="income"
                     stroke="#82ca9d"
                     fillOpacity={1}
                     fill="url(#colorPv)"
