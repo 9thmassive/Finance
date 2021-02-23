@@ -47,17 +47,17 @@ function Expenses() {
 
     const [dropDownVal, setDropDownVal] = useState('Select Expenses Group')
     const [dropVal, setDropVal] = useState(expList)
-    const [filterDrop,setFilterDrop] = useState()
+    const [filterDrop, setFilterDrop] = useState()
     //------------------
     const [rowData, setRowData] = useState([])
-    const [fullData, setFullData] = useState();
+    const [fullData, setFullData] = useState()
     //-------------------
     const groupNameRef = useRef()
     const nameRef = useRef()
     const priceRef = useRef()
     const [selectedGroup, setSelectedGroup] = useState('Car Payment')
     //-------------------
-    const[targetGroup,setTargetGroup] = useState()
+    const [targetGroup, setTargetGroup] = useState()
 
     const toDay = () =>
         new Date().toLocaleDateString().split('/').join('-').toString()
@@ -111,8 +111,7 @@ function Expenses() {
                     }
                 })
         }
-    }, [uid]);
-
+    }, [uid])
 
     //
     async function handleAddExpenses() {
@@ -236,44 +235,60 @@ function Expenses() {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',
-        }).then( (result) => {
-          setTargetGroup(   e.target.parentNode.innerHTML.split('<')[0])
+        }).then((result) => {
+            setTargetGroup(e.target.parentNode.innerHTML.split('<')[0])
 
             if (result.isConfirmed) {
+                firebase
+                    .firestore()
+                    .collection('expenses')
+                    .doc(uid)
+                    .get()
+                    .then((doc) => {
+                        setFullData((prev) => (prev = doc.data()))
+                    })
 
-                firebase.firestore().collection('expenses').doc(uid).get().then((doc)=>{
-                  setFullData((prev)=>prev = doc.data())
-                },)
-
-                firebase.firestore().collection('user').doc(uid).get().then((doc)=>{
-                  setFilterDrop(doc.data().dropdown)
-
-                  console.log(doc.data())
-                },)
-
+                firebase
+                    .firestore()
+                    .collection('user')
+                    .doc(uid)
+                    .get()
+                    .then((doc) => {
+                        setFilterDrop(doc.data().dropdown)
+                    })
             }
         })
     }
-    useEffect(()=>{
-        if(filterDrop){
-          let data = filterDrop.filter(({nameExp})=>nameExp!=targetGroup)
-          firebase.firestore().collection('user').doc(uid).set({dropdown:data})
-          console.log(filterDrop,'effect')
-          setDropVal([...expList,...data])
+    useEffect(() => {
+        if (filterDrop) {
+            let data = filterDrop.filter(
+                ({ nameExp }) => nameExp != targetGroup
+            )
+            firebase
+                .firestore()
+                .collection('user')
+                .doc(uid)
+                .set({ dropdown: data })
+            console.log(filterDrop, 'effect')
+            setDropVal([...expList, ...data])
         }
-
-    },[filterDrop])
+    }, [filterDrop])
 
     useEffect(() => {
-      if(fullData){
-        let filteredData = fullData
-        for(let arr in filteredData){
-          filteredData[arr] = filteredData[arr].filter(({group})=>group!==targetGroup)
+        if (fullData) {
+            let filteredData = fullData
+            for (let arr in filteredData) {
+                filteredData[arr] = filteredData[arr].filter(
+                    ({ group }) => group !== targetGroup
+                )
+            }
+            firebase
+                .firestore()
+                .collection('expenses')
+                .doc(uid)
+                .set({ ...filteredData })
         }
-        firebase.firestore().collection('expenses').doc(uid).set({...filteredData})
-
-      }
-    },[fullData]);
+    }, [fullData])
 
     const popover = (
         <Popover id="popover-basic">
@@ -413,7 +428,7 @@ function Expenses() {
                     className="ag-theme-alpine"
                     style={{ height: 300, width: 'auto' }}
                 >
-                    <AgGridReact rowData={rowData} >
+                    <AgGridReact rowData={rowData}>
                         <AgGridColumn field="group"></AgGridColumn>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>

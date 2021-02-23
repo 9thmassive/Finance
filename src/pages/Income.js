@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Spinner} from 'react-bootstrap'
+import { Button, Spinner } from 'react-bootstrap'
 import { Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -11,26 +11,26 @@ import './inc.css'
 toast.configure()
 
 function Income() {
-    const [uid, setUid] = useState(null);
-    const [incomeData, setIncomeData] = useState([]);
+    const [uid, setUid] = useState(null)
+    const [incomeData, setIncomeData] = useState([])
     useEffect(() => {
-      if(uid === null) {
-        return
-      }
-      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
-        let currentData = doc.data();
-        let dataResult = [];
-        for(let data of Object.values(currentData)) {
-          dataResult = [...data, ...dataResult]
+        if (uid === null) {
+            return
         }
-        setIncomeData(dataResult);
-      })
-    },[uid])
+        //   firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+        //     let currentData = doc.data();
+        //     let dataResult = [];
+        //     for(let data of Object.values(currentData)) {
+        //       dataResult = [...data, ...dataResult]
+        //     }
+        //     setIncomeData(dataResult);
+        //   })
+    }, [uid])
     useEffect(() => {
         firebase.auth().onAuthStateChanged((currentUser) => {
             setUid(currentUser?.uid)
         })
-    }, []);
+    }, [])
 
     const [emptyData, setEmptyData] = useState(false)
 
@@ -39,8 +39,8 @@ function Income() {
     const [rowData, setRowData] = useState([])
 
     useEffect(() => {
-      console.log(rowData)
-    },[rowData]);
+        console.log(rowData)
+    }, [rowData])
     //-------------------
     const nameRef = useRef()
     const priceRef = useRef()
@@ -96,7 +96,7 @@ function Income() {
                     }
                 })
         }
-    }, [uid]);
+    }, [uid])
 
     // useEffect(() => {
     //   if(!uid) return;
@@ -121,7 +121,6 @@ function Income() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-
 
         if (emptyData) {
             await firebase
@@ -177,36 +176,34 @@ function Income() {
                         }}
                     />
                 </div>
-                <br/>
+                <br />
                 <div className="incomeData">
-
-
-                {req ? (
-                    <Button
-                        className="btn mainColor w-50"
-                        onClick={handleAddIncome}
-                    >
-                        Add List
-                    </Button>
-                ) : (
-                    <Button
-                        className="w-50 mainColor"
-                        variant="primary"
-                        disabled
-                    >
-                        <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                        />
-                        <span className="sr-only">Loading...</span>
-                    </Button>
-                )}
+                    {req ? (
+                        <Button
+                            className="btn mainColor w-50"
+                            onClick={handleAddIncome}
+                        >
+                            Add List
+                        </Button>
+                    ) : (
+                        <Button
+                            className="w-50 mainColor"
+                            variant="primary"
+                            disabled
+                        >
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            <span className="sr-only">Loading...</span>
+                        </Button>
+                    )}
                 </div>
             </div>
-            <br/>
+            <br />
 
             <div className="listt incomeData">
                 <br />
@@ -225,4 +222,3 @@ function Income() {
     )
 }
 export default Income
-
