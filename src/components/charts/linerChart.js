@@ -11,15 +11,15 @@ const data = [
 
 export default function App() {
   const [uid, setUid] = useState(null);
-  const [income, setIncome] = useState({});
-  const [expense, setExpense] = useState({});
+  const [income, setIncome] = useState([]);
+  const [expense, setExpense] = useState([]);
+  const [mergeIncomeExpense, setMergeIncomeExpense] = useState([]);
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       setUid(user?.uid);
     });
   },[]);
-
   //setting income and expense data to state
   useEffect(() => {
     if(!uid) {
@@ -46,6 +46,27 @@ export default function App() {
 
   }, [uid]);
  //----
+
+ //merging expense and income include merging
+ useEffect(() => {
+    let mergeResult = {};
+    expense.forEach(([date, value]) => {
+      mergeResult[date] = {income: 0, expense: value};
+    });
+    income.forEach(([date, value]) => {
+      if(mergeResult[date]) {
+        mergeResult[date].income = value;
+      } else {
+        mergeResult[date] = {expense: 0, income: value}
+      }
+    });
+    mergeResult = Object.entries(mergeResult).map(([date, {income, expense}]) => {
+      return {income, expense, name: date}
+    }).sort((a,b) => {
+      return +a.name.split('-')[1] - +b.name.split('-')[1]
+    });
+    console.log(mergeResult)
+ },[income, expense]);
  useEffect(() => {
   console.log(expense)
  },[expense])
