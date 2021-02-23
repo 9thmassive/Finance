@@ -12,35 +12,36 @@ toast.configure()
 
 function Income() {
     const [uid, setUid] = useState(null);
-    const [incomeData, setIncomeData] = useState([]);
-    useEffect(() => {
-      if(uid === null) {
-        return
-      }
-      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
-        let currentData = doc.data();
-        let dataResult = [];
-        for(let data of Object.values(currentData)) {
-          dataResult = [...data, ...dataResult]
-        }
-        setIncomeData(dataResult);
-      })
-    },[uid])
+    const [incomeGridData, setIncomeGridData] = useState([]);
+    const [incomeData, setIncomeData] = useState(null);
+
     useEffect(() => {
         firebase.auth().onAuthStateChanged((currentUser) => {
             setUid(currentUser?.uid)
         })
     }, []);
 
-    const [emptyData, setEmptyData] = useState(false)
+    useEffect(() => {
+      if(uid === null) {
+        return
+      }
+      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+        setIncomeData(doc.data());
+
+      })
+    },[uid]);
+
+    useEffect(() => {
+      if(!incomeData) return;
+        let dataResult = [];
+        for(let data of Object.values(incomeData)) {
+          dataResult = [ ...dataResult, ...data]
+        }
+        setIncomeGridData(dataResult);
+    },[incomeData])
 
     const [req, setReq] = useState(true)
 
-    const [rowData, setRowData] = useState([])
-
-    useEffect(() => {
-      console.log(rowData)
-    },[rowData]);
     //-------------------
     const nameRef = useRef()
     const priceRef = useRef()
@@ -84,33 +85,10 @@ function Income() {
             })
         }
     }
-    useEffect(() => {
-        if (uid) {
-            firebase
-                .firestore()
-                .collection('income')
-                .doc(uid)
-                .get((doc) => {
-                    if (!doc.data()[toDay()]) {
-                        setEmptyData(!emptyData)
-                    }
-                })
-        }
-    }, [uid]);
 
-    // useEffect(() => {
-    //   if(!uid) return;
-    //   firebase.firestore().collection('income').doc(uid).get(doc => {
-    //     let currentData = [];
-    //     for(let data of Object.values(doc.data())) {
-    //       currentData = [...currentData, ...data];
-    //     }
-    //     setRowData(currentData);
-    //   })
-    // },[uid]);
-    //
 
     async function handleAddIncome() {
+
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
             priceRef.current.style.border = 'red solid 3px'
 
@@ -121,34 +99,32 @@ function Income() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-
-
-        if (emptyData) {
-            await firebase
+        //My code here
+        if(!incomeData || !incomeData[toDay()]) {
+          await firebase
                 .firestore()
                 .collection('income')
                 .doc(uid)
                 .set({
-                    [toDay()]: [
-                        {
-                            name: nameRef.current.value,
-                            value: priceRef.current.value,
-                            date: toDay() + thisTime(),
-                        },
-                    ],
+                  [toDay()]: [
+                    {
+                      name: nameRef.current.value,
+                      value: priceRef.current.value,
+                      date: toDay() + thisTime(),
+                    }
+                  ]
                 })
-            setEmptyData((prev) => !prev)
         } else {
-            await firebase
+          await firebase
                 .firestore()
                 .collection('income')
                 .doc(uid)
                 .update({
-                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        date: toDay() + thisTime(),
-                    }),
+                  [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                      name: nameRef.current.value,
+                      value: priceRef.current.value,
+                      date: toDay() + thisTime(),
+                  })
                 })
         }
 
@@ -214,7 +190,7 @@ function Income() {
                     className="ag-theme-alpine"
                     style={{ height: 400, width: 600 }}
                 >
-                    <AgGridReact rowData={incomeData}>
+                    <AgGridReact rowData={incomeGridData}>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
                         <AgGridColumn field="date"></AgGridColumn>
