@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Spinner} from 'react-bootstrap'
+import { Button, Spinner } from 'react-bootstrap'
 import { Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -11,25 +11,28 @@ import './inc.css'
 toast.configure()
 
 function Income() {
-    const [uid, setUid] = useState(null);
-    const [incomeGridData, setIncomeGridData] = useState([]);
-    const [incomeData, setIncomeData] = useState(null);
 
+    const [uid, setUid] = useState(null)
+    const [incomeData, setIncomeData] = useState([])
+    useEffect(() => {
+        if (uid === null) {
+            return
+        }
+        //   firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+        //     let currentData = doc.data();
+        //     let dataResult = [];
+        //     for(let data of Object.values(currentData)) {
+        //       dataResult = [...data, ...dataResult]
+        //     }
+        //     setIncomeData(dataResult);
+        //   })
+    }, [uid])
     useEffect(() => {
         firebase.auth().onAuthStateChanged((currentUser) => {
             setUid(currentUser?.uid)
         })
-    }, []);
+    }, [])
 
-    useEffect(() => {
-      if(uid === null) {
-        return
-      }
-      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
-        setIncomeData(doc.data());
-
-      })
-    },[uid]);
 
     useEffect(() => {
       if(!incomeData) return;
@@ -41,6 +44,13 @@ function Income() {
     },[incomeData])
 
     const [req, setReq] = useState(true)
+
+
+    const [rowData, setRowData] = useState([])
+
+    useEffect(() => {
+        console.log(rowData)
+    }, [rowData])
 
     //-------------------
     const nameRef = useRef()
@@ -86,6 +96,32 @@ function Income() {
         }
     }
 
+    useEffect(() => {
+        if (uid) {
+            firebase
+                .firestore()
+                .collection('income')
+                .doc(uid)
+                .get((doc) => {
+                    if (!doc.data()[toDay()]) {
+                        setEmptyData(!emptyData)
+                    }
+                })
+        }
+    }, [uid])
+
+    // useEffect(() => {
+    //   if(!uid) return;
+    //   firebase.firestore().collection('income').doc(uid).get(doc => {
+    //     let currentData = [];
+    //     for(let data of Object.values(doc.data())) {
+    //       currentData = [...currentData, ...data];
+    //     }
+    //     setRowData(currentData);
+    //   })
+    // },[uid]);
+    //
+
 
     async function handleAddIncome() {
 
@@ -99,9 +135,11 @@ function Income() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        //My code here
-        if(!incomeData || !incomeData[toDay()]) {
-          await firebase
+
+
+        if (emptyData) {
+            await firebase
+
                 .firestore()
                 .collection('income')
                 .doc(uid)
@@ -153,36 +191,34 @@ function Income() {
                         }}
                     />
                 </div>
-                <br/>
+                <br />
                 <div className="incomeData">
-
-
-                {req ? (
-                    <Button
-                        className="btn mainColor w-50"
-                        onClick={handleAddIncome}
-                    >
-                        Add List
-                    </Button>
-                ) : (
-                    <Button
-                        className="w-50 mainColor"
-                        variant="primary"
-                        disabled
-                    >
-                        <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                        />
-                        <span className="sr-only">Loading...</span>
-                    </Button>
-                )}
+                    {req ? (
+                        <Button
+                            className="btn mainColor w-50"
+                            onClick={handleAddIncome}
+                        >
+                            Add List
+                        </Button>
+                    ) : (
+                        <Button
+                            className="w-50 mainColor"
+                            variant="primary"
+                            disabled
+                        >
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            <span className="sr-only">Loading...</span>
+                        </Button>
+                    )}
                 </div>
             </div>
-            <br/>
+            <br />
 
             <div className="listt incomeData">
                 <br />
@@ -201,4 +237,3 @@ function Income() {
     )
 }
 export default Income
-
