@@ -1,4 +1,6 @@
 import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts';
+import firebase from 'firebase';
+import {useEffect, useState} from 'react';
 const data = [
     {
         name: 'March',
@@ -8,6 +10,45 @@ const data = [
 ]
 
 export default function App() {
+  const [uid, setUid] = useState(null);
+  const [income, setIncome] = useState({});
+  const [expense, setExpense] = useState({});
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      setUid(user?.uid);
+    });
+  },[]);
+
+  //setting income and expense data to state
+  useEffect(() => {
+    if(!uid) {
+      return
+    }
+    firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+      if(doc.data()) {
+        setIncome(Object.entries(doc.data()).map(([data, arrOfData]) => {
+          return [data, arrOfData.reduce((a,{value}) => {
+            return a + +value;
+          },0)]
+        }))
+      }
+    });
+    firebase.firestore().collection('expenses').doc(uid).onSnapshot(doc => {
+      if(doc.data()) {
+        setExpense(Object.entries(doc.data()).map(([data, arrOfData]) => {
+          return [data, arrOfData.reduce((a,{value}) => {
+            return a + +value;
+          },0)]
+        }))
+      }
+    });
+
+  }, [uid]);
+ //----
+ useEffect(() => {
+  console.log(expense)
+ },[expense])
 
     return (
         <div className="linerChart-container">
