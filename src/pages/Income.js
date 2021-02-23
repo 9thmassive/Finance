@@ -11,6 +11,7 @@ import './inc.css'
 toast.configure()
 
 function Income() {
+
     const [uid, setUid] = useState(null)
     const [incomeData, setIncomeData] = useState([])
     useEffect(() => {
@@ -32,15 +33,25 @@ function Income() {
         })
     }, [])
 
-    const [emptyData, setEmptyData] = useState(false)
+
+    useEffect(() => {
+      if(!incomeData) return;
+        let dataResult = [];
+        for(let data of Object.values(incomeData)) {
+          dataResult = [ ...dataResult, ...data]
+        }
+        setIncomeGridData(dataResult);
+    },[incomeData])
 
     const [req, setReq] = useState(true)
+
 
     const [rowData, setRowData] = useState([])
 
     useEffect(() => {
         console.log(rowData)
     }, [rowData])
+
     //-------------------
     const nameRef = useRef()
     const priceRef = useRef()
@@ -84,6 +95,7 @@ function Income() {
             })
         }
     }
+
     useEffect(() => {
         if (uid) {
             firebase
@@ -110,7 +122,9 @@ function Income() {
     // },[uid]);
     //
 
+
     async function handleAddIncome() {
+
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
             priceRef.current.style.border = 'red solid 3px'
 
@@ -122,32 +136,33 @@ function Income() {
         }
         setReq((prev) => !prev)
 
+
         if (emptyData) {
             await firebase
+
                 .firestore()
                 .collection('income')
                 .doc(uid)
                 .set({
-                    [toDay()]: [
-                        {
-                            name: nameRef.current.value,
-                            value: priceRef.current.value,
-                            date: toDay() + thisTime(),
-                        },
-                    ],
+                  [toDay()]: [
+                    {
+                      name: nameRef.current.value,
+                      value: priceRef.current.value,
+                      date: toDay() + thisTime(),
+                    }
+                  ]
                 })
-            setEmptyData((prev) => !prev)
         } else {
-            await firebase
+          await firebase
                 .firestore()
                 .collection('income')
                 .doc(uid)
                 .update({
-                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        date: toDay() + thisTime(),
-                    }),
+                  [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                      name: nameRef.current.value,
+                      value: priceRef.current.value,
+                      date: toDay() + thisTime(),
+                  })
                 })
         }
 
@@ -211,7 +226,7 @@ function Income() {
                     className="ag-theme-alpine"
                     style={{ height: 400, width: 600 }}
                 >
-                    <AgGridReact rowData={incomeData}>
+                    <AgGridReact rowData={incomeGridData}>
                         <AgGridColumn field="name"></AgGridColumn>
                         <AgGridColumn field="value"></AgGridColumn>
                         <AgGridColumn field="date"></AgGridColumn>

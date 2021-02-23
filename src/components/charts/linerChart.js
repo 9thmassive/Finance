@@ -1,134 +1,83 @@
-import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts'
+import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts';
+import firebase from 'firebase';
+import {useEffect, useState} from 'react';
 const data = [
     {
         name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2000,
-        Out: 1500,
-    },
-    {
-        name: 'Jun',
-        In: 2000,
-        Out: 5400,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2000,
-        Out: 1500,
-    },
-    {
-        name: 'Jun',
-        In: 2000,
-        Out: 5400,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 2500,
-        Out: 3000,
-    },
-    {
-        name: 'July',
-        In: 3800,
-        Out: 1400,
-    },
-    {
-        name: 'Ougust',
-        In: 5500,
-        Out: 6000,
-    },
-    {
-        name: 'March',
-        In: 1200,
-        Out: 1300,
-    },
-    {
-        name: 'April',
-        In: 6000,
-        Out: 3541,
-    },
-    {
-        name: 'May',
-        In: 2600,
-        Out: 500,
-    },
-    {
-        name: 'Jun',
-        In: 3000,
-        Out: 1000,
-    },
-    {
-        name: 'July',
-        In: 800,
-        Out: 400,
-    },
-    {
-        name: 'Ougust',
-        In: 6500,
-        Out: 1000,
-    },
-    {
-        name: 'July',
-        In: 2800,
-        Out: 4400,
-    },
-    {
-        name: 'Ougust',
-        In: 1500,
-        Out: 2000,
+        inc: 1200,
+        exp: 1300,
     },
 ]
 
 export default function App() {
+  const [uid, setUid] = useState(null);
+  const [income, setIncome] = useState([]);
+  const [expense, setExpense] = useState([]);
+  const [mergeIncomeExpense, setMergeIncomeExpense] = useState([]);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(user => {
+      setUid(user?.uid);
+    });
+  },[]);
+  //setting income and expense data to state
+  useEffect(() => {
+    if(!uid) {
+      return
+    }
+    firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
+      if(doc.data()) {
+        setIncome(Object.entries(doc.data()).map(([data, arrOfData]) => {
+          return [data, arrOfData.reduce((a,{value}) => {
+            return a + +value;
+          },0)]
+        }))
+      }
+    });
+    firebase.firestore().collection('expenses').doc(uid).onSnapshot(doc => {
+      if(doc.data()) {
+        setExpense(Object.entries(doc.data()).map(([data, arrOfData]) => {
+          return [data, arrOfData.reduce((a,{value}) => {
+            return a + +value;
+          },0)]
+        }))
+      }
+    });
+
+  }, [uid]);
+ //----
+
+ //merging expense and income include merging
+ useEffect(() => {
+    let mergeResult = {};
+    expense.forEach(([date, value]) => {
+      mergeResult[date] = {income: 0, expense: value};
+    });
+    income.forEach(([date, value]) => {
+      if(mergeResult[date]) {
+        mergeResult[date].income = value;
+      } else {
+        mergeResult[date] = {expense: 0, income: value}
+      }
+    });
+    mergeResult = Object.entries(mergeResult).map(([date, {income, expense}]) => {
+      return {income, expense, name: date}
+    }).sort((a,b) => {
+      return +a.name.split('-')[1] - +b.name.split('-')[1]
+    });
+    setMergeIncomeExpense(mergeResult)
+
+ },[income, expense]);
+ useEffect(() => {
+  console.log(expense)
+ },[expense])
+
     return (
         <div className="linerChart-container">
             <AreaChart
                 width={730}
                 height={250}
-                data={data}
+                data={mergeIncomeExpense}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 className="linerChartPosition"
             >
@@ -156,14 +105,14 @@ export default function App() {
                 <Tooltip />
                 <Area
                     type="monotone"
-                    dataKey="In"
+                    dataKey="expense"
                     stroke="#8884d8"
                     fillOpacity={1}
                     fill="url(#colorUv)"
                 />
                 <Area
                     type="monotone"
-                    dataKey="Out"
+                    dataKey="income"
                     stroke="#82ca9d"
                     fillOpacity={1}
                     fill="url(#colorPv)"
