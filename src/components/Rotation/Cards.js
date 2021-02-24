@@ -1,77 +1,124 @@
 import Cart from './../card/Cart'
 import incomes from './icons/income.svg'
-import {useState,useEffect} from 'react'
-import expenses from './icons/expense.svg'
+import { useState, useEffect } from 'react'
+import expense from './icons/expense.svg'
 import wallet from './icons/wallet.svg'
 import firebase from 'firebase'
 
+const data = [
+    {
+        name: 'Page A',
+        uv: 4000,
+        pv: 2400,
+        amt: 2400,
+    },
+    {
+        name: 'Page B',
+        uv: 3000,
+        pv: 1398,
+        amt: 2210,
+    },
+    {
+        name: 'Page C',
+        uv: 2000,
+        pv: 9800,
+        amt: 2290,
+    },
+    {
+        name: 'Page D',
+        uv: 2780,
+        pv: 3908,
+        amt: 2000,
+    },
+    {
+        name: 'Page E',
+        uv: 1890,
+        pv: 4800,
+        amt: 2181,
+    },
+    {
+        name: 'Page F',
+        uv: 2390,
+        pv: 3800,
+        amt: 2500,
+    },
+    {
+        name: 'Page G',
+        uv: 3490,
+        pv: 4300,
+        amt: 2100,
+    },
+]
+
 export default function Cards() {
+    const [expenses, setExpenses] = useState(0)
 
-    const [expenses, setExpenses ]= useState(254000)
-
-
-
-    const [income,setIncome] = useState(345000)
-    const [balanc,setBalanc] = useState(income-expenses)
+    const [income, setIncome] = useState(0)
+    const [balanc, setBalanc] = useState(income - expenses)
     const uid = firebase.auth().currentUser?.uid
     let cardInfo = [
         {
-            money: balanc+ ' $',
+            money: balanc,
             type: 'Balance',
             icon: wallet,
         },
         {
-            money: income + ' $',
+            money: income,
             type: 'Income',
             icon: incomes,
         },
         {
-           money: expenses + ' $',
+            money: expenses,
             type: 'Expenses',
-            icon: expenses,
+            icon: expense,
         },
     ]
 
-
-
-    useEffect(
-        async ()=>{
-
-            let  expDat = await firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .get((doc)=>{
-                    expDat = doc.data()
-                })
-
-        },[])
-          // useEffect(
-    //     async ()=>{
-
-    //         let  expDat = await firebase
-    //             .firestore()
-    //             .collection('expenses')
-    //             .doc(uid)
-    //             .get((doc)=>{
-    //                 expDat = doc
-    //             })
-    //         expDat = Object.values(expDat.data())[0]
-    //         expDat = expDat.reduce((b,{value})=>+value+b,0)
-    //         setExpenses(()=>expDat)
-    //         setBalanc(()=>income-expenses)
-    //     },[])
-
-
-
+    useEffect(async () => {
+        await firebase
+            .firestore()
+            .collection('expenses')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                const allData = doc.data()
+                let sum = 0
+                for (let key in allData) {
+                    sum = allData[key].reduce((a, { value }) => a + +value, 0)
+                }
+                setExpenses(() => sum)
+            })
+        await firebase
+            .firestore()
+            .collection('income')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                const allData = doc.data()
+                let sum = 0
+                for (let key in allData) {
+                    sum = allData[key].reduce((a, { value }) => a + +value, 0)
+                }
+                setIncome(() => sum)
+            })
+    }, [uid])
+    useEffect(() => {
+        setBalanc((prev) => (prev = income - expenses))
+    }, [income, expense])
     return (
         <div className="cart-container">
             {cardInfo.map(({ money, type, icon }, index) => {
                 return (
-                    <Cart money={money} type={type} icon={icon} key={index} />
+                    <>
+                        <Cart
+                            barData=""
+                            font_color={money < 0 ? '#aa2b1d' : null}
+                            money={money + ' $'}
+                            type={type}
+                            icon={icon}
+                            key={index}
+                        />
+                    </>
                 )
             })}
-
         </div>
     )
 }
