@@ -9,6 +9,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
 import myGrupRemoveIcoN from './img/dropRemov.svg'
+import { firbaseCall } from './../Firebase/firebase'
 import './exp.css'
 // import myGrupRemoveIcoN from './img/dropRemov.svg'
 //
@@ -101,15 +102,20 @@ function Expenses() {
     }
     useEffect(() => {
         if (uid) {
-            firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .get((doc) => {
-                    if (!doc.data()[toDay()]) {
-                        setEmptyData(!emptyData)
-                    }
-                })
+            firbaseCall('expenses', uid).get((doc) => {
+                if (!doc.data()[toDay()]) {
+                    setEmptyData(!emptyData)
+                }
+            })
+            // firebase
+            //     .firestore()
+            //     .collection('expenses')
+            //     .doc(uid)
+            //     .get((doc) => {
+            //         if (!doc.data()[toDay()]) {
+            //             setEmptyData(!emptyData)
+            //         }
+            //     })
         }
     }, [uid])
 
@@ -126,36 +132,57 @@ function Expenses() {
         }
         setReq((prev) => !prev)
         if (emptyData) {
-            await firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .set({
-                    [toDay()]: [
-                        {
-                            group: selectedGroup,
-                            name: nameRef.current.value,
-                            value: priceRef.current.value,
-                            priority: rating,
-                            date: toDay() + thisTime(),
-                        },
-                    ],
-                })
-            setEmptyData((prev) => !prev)
-        } else {
-            await firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .update({
-                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+            await firbaseCall('expenses', uid).set({
+                [toDay()]: [
+                    {
                         group: selectedGroup,
                         name: nameRef.current.value,
                         value: priceRef.current.value,
                         priority: rating,
-                        date: toDay() + ' - ' + thisTime(),
-                    }),
-                })
+                        date: toDay() + thisTime(),
+                    },
+                ],
+            })
+
+            // await firebase
+            //     .firestore()
+            //     .collection('expenses')
+            //     .doc(uid)
+            //     .set({
+            //         [toDay()]: [
+            //             {
+            //                 group: selectedGroup,
+            //                 name: nameRef.current.value,
+            //                 value: priceRef.current.value,
+            //                 priority: rating,
+            //                 date: toDay() + thisTime(),
+            //             },
+            //         ],
+            //     })
+            setEmptyData((prev) => !prev)
+        } else {
+            await firbaseCall('expenses', uid).update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    group: selectedGroup,
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    priority: rating,
+                    date: toDay() + ' - ' + thisTime(),
+                }),
+            })
+            // await firebase
+            //     .firestore()
+            //     .collection('expenses')
+            //     .doc(uid)
+            //     .update({
+            //         [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+            //             group: selectedGroup,
+            //             name: nameRef.current.value,
+            //             value: priceRef.current.value,
+            //             priority: rating,
+            //             date: toDay() + ' - ' + thisTime(),
+            //         }),
+            //     })
         }
 
         setReq((prev) => !prev)
@@ -166,6 +193,7 @@ function Expenses() {
         if (!uid) {
             return
         }
+
         firebase
             .firestore()
             .collection('expenses')
@@ -187,15 +215,20 @@ function Expenses() {
         if (groupNameRef.current.value.length === 0) {
             return setGroup(!group)
         }
-        await firebase
-            .firestore()
-            .collection('user')
-            .doc(uid)
-            .update({
-                dropdown: firebase.firestore.FieldValue.arrayUnion({
-                    nameExp: groupNameRef.current.value,
-                }),
-            })
+        await firbaseCall('expenses', uid).update({
+            dropdown: firebase.firestore.FieldValue.arrayUnion({
+                nameExp: groupNameRef.current.value,
+            }),
+        })
+        // await firebase
+        //     .firestore()
+        //     .collection('user')
+        //     .doc(uid)
+        //     .update({
+        //         dropdown: firebase.firestore.FieldValue.arrayUnion({
+        //             nameExp: groupNameRef.current.value,
+        //         }),
+        //     })
         setDropDownVal(groupNameRef.current.value)
         setGroup((prev) => !prev)
         return userMessage(
@@ -207,23 +240,35 @@ function Expenses() {
         if (!uid) {
             return
         }
-        firebase
-            .firestore()
-            .collection('user')
-            .doc(uid)
-            .onSnapshot((doc) => {
-                if (doc.data()?.dropdown) {
-                    setDropVal(() => [...dropVal, ...doc.data()?.dropdown])
-                    //remove dubllicate from dropdown data
-                    setDropVal((prev) =>
-                        prev.filter(
-                            (v, i, a) =>
-                                a.findIndex((t) => t.nameExp === v.nameExp) ===
-                                i
-                        )
+        firbaseCall('expenses', uid).onSnapshot((doc) => {
+            if (doc.data()?.dropdown) {
+                setDropVal(() => [...dropVal, ...doc.data()?.dropdown])
+                //remove dubllicate from dropdown data
+                setDropVal((prev) =>
+                    prev.filter(
+                        (v, i, a) =>
+                            a.findIndex((t) => t.nameExp === v.nameExp) === i
                     )
-                }
-            })
+                )
+            }
+        })
+        // firebase
+        //     .firestore()
+        //     .collection('user')
+        //     .doc(uid)
+        //     .onSnapshot((doc) => {
+        //         if (doc.data()?.dropdown) {
+        //             setDropVal(() => [...dropVal, ...doc.data()?.dropdown])
+        //             //remove dubllicate from dropdown data
+        //             setDropVal((prev) =>
+        //                 prev.filter(
+        //                     (v, i, a) =>
+        //                         a.findIndex((t) => t.nameExp === v.nameExp) ===
+        //                         i
+        //                 )
+        //             )
+        //         }
+        //     })
     }, [uid])
     async function handleRemoveGroup(e) {
         Swal.fire({
@@ -239,23 +284,35 @@ function Expenses() {
             setTargetGroup(e.target.parentNode.innerHTML.split('<')[0])
 
             if (result.isConfirmed) {
-                firebase
-                    .firestore()
-                    .collection('expenses')
-                    .doc(uid)
+                firbaseCall('expenses', uid)
                     .get()
                     .then((doc) => {
                         setFullData((prev) => (prev = doc.data()))
                     })
 
-                firebase
-                    .firestore()
-                    .collection('user')
-                    .doc(uid)
+                // firebase
+                //     .firestore()
+                //     .collection('expenses')
+                //     .doc(uid)
+                //     .get()
+                //     .then((doc) => {
+                //         setFullData((prev) => (prev = doc.data()))
+                //     })
+
+                firbaseCall('user', uid)
                     .get()
                     .then((doc) => {
                         setFilterDrop(doc.data().dropdown)
                     })
+
+                // firebase
+                //     .firestore()
+                //     .collection('user')
+                //     .doc(uid)
+                //     .get()
+                //     .then((doc) => {
+                //         setFilterDrop(doc.data().dropdown)
+                //     })
             }
         })
     }
@@ -264,12 +321,15 @@ function Expenses() {
             let data = filterDrop.filter(
                 ({ nameExp }) => nameExp != targetGroup
             )
-            firebase
-                .firestore()
-                .collection('user')
-                .doc(uid)
-                .set({ dropdown: data })
-            console.log(filterDrop, 'effect')
+
+            firbaseCall('user', uid).doc(uid).set({ dropdown: data })
+
+            // firebase
+            //     .firestore()
+            //     .collection('user')
+            //     .doc(uid)
+            //     .set({ dropdown: data })
+
             setDropVal([...expList, ...data])
         }
     }, [filterDrop])

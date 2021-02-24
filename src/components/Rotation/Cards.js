@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import expense from './icons/expense.svg'
 import wallet from './icons/wallet.svg'
 import firebase from 'firebase'
+import { firbaseCall } from './../../Firebase/firebase'
 
 const data = [
     {
@@ -75,30 +76,23 @@ export default function Cards() {
     ]
 
     useEffect(async () => {
-        await firebase
-            .firestore()
-            .collection('expenses')
-            .doc(uid)
-            .onSnapshot((doc) => {
-                const allData = doc.data()
-                let sum = 0
-                for (let key in allData) {
-                    sum = allData[key].reduce((a, { value }) => a + +value, 0)
-                }
-                setExpenses(() => sum)
-            })
-        await firebase
-            .firestore()
-            .collection('income')
-            .doc(uid)
-            .onSnapshot((doc) => {
-                const allData = doc.data()
-                let sum = 0
-                for (let key in allData) {
-                    sum = allData[key].reduce((a, { value }) => a + +value, 0)
-                }
-                setIncome(() => sum)
-            })
+        await firbaseCall('expenses', uid).onSnapshot((doc) => {
+            const allData = doc.data()
+            let sum = 0
+            for (let key in allData) {
+                sum = allData[key].reduce((a, { value }) => a + +value, 0)
+            }
+            setExpenses(() => sum)
+        })
+
+        await firbaseCall('income', uid).onSnapshot((doc) => {
+            const allData = doc.data()
+            let sum = 0
+            for (let key in allData) {
+                sum = allData[key].reduce((a, { value }) => a + +value, 0)
+            }
+            setIncome(() => sum)
+        })
     }, [uid])
     useEffect(() => {
         setBalanc((prev) => (prev = income - expenses))
