@@ -109,7 +109,7 @@ export default function Cards() {
                 return (
                     <>
                         <Cart
-                            barData=""
+                            barData={data}
                             font_color={money < 0 ? '#aa2b1d' : null}
                             money={money + ' $'}
                             type={type}
