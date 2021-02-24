@@ -74,7 +74,7 @@ export default function Login() {
                                 <h2 className="text-center mb-4 drk">
                                     Sign in
                                 </h2>
-                                <Facebook />
+                                {/* <Facebook /> */}
 
                                 <Google />
                                 <Form.Group id="email">
