@@ -1,4 +1,3 @@
-//first row - from Mariam
 /*import MainDeposit from './components/Deposit/MainDeposit'*/
 
 import React from 'react'
@@ -13,6 +12,10 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('root')
 )
+
+//first row - from Mariam
+//<div class="container-fluid" id="form"></div>
+
 //first row - from Mariam
 /*ReactDOM.render(<MainDeposit />, document.getElementById("root"));*/
 

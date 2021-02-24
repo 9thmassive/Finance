@@ -8,9 +8,9 @@ import Swal from 'sweetalert2'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import Rating from 'react-simple-star-rating'
-import myGrupRemoveIcoN from './img/dropRemov.svg'
+import myGrupRemoveIcoN from './img/dropRemove.svg'
 import './exp.css'
-// import myGrupRemoveIcoN from './img/dropRemov.svg'
+// import myGrupRemoveIcoN from './img/dropRemove.svg'
 //
 const expList = [
     {
@@ -172,9 +172,9 @@ function Expenses() {
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
-                if (doc.data()[toDay()]) {
+                /*if (doc.data()[toDay()]) {
                     setRowData(doc.data()[toDay()].reverse())
-                }
+                }*/
             })
     }, [uid])
 
@@ -407,7 +407,7 @@ function Expenses() {
                 )}
             </div>
 
-            <div className="listt ">
+            <div className="list ">
                 <br />
                 <div
                     className="ag-theme-alpine"

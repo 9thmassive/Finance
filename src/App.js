@@ -10,7 +10,7 @@ import Navbar from './components/NavBar/Navbar'
 import LeadingPage from './components/leadingPage/LeadingPage'
 
 import MainDeposit from './components/Deposit/MainDeposit'
-
+import Hypothec from './components/Hypothec/Hypothec'
 
 import Transaction from './pages/Transaction'
 import Income from './pages/Income'
@@ -107,6 +107,9 @@ function App() {
                     </Route>
                     <Route exact path="/calculator">
                       <MainDeposit/>
+                    </Route>
+                    <Route exact path="/hypothec">
+                      <Hypothec/>
                     </Route>
                 </Switch>
             </Router>

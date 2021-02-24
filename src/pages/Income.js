@@ -20,9 +20,9 @@ function Income() {
       firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
         let currentData = doc.data();
         let dataResult = [];
-        for(let data of Object.values(currentData)) {
+        /*for(let data of Object.values(currentData)) {
           dataResult = [...data, ...dataResult]
-        }
+        }*/
         setIncomeData(dataResult);
       })
     },[uid])
@@ -208,7 +208,7 @@ function Income() {
             </div>
             <br/>
 
-            <div className="listt incomeData">
+            <div className="list incomeData">
                 <br />
                 <div
                     className="ag-theme-alpine"
