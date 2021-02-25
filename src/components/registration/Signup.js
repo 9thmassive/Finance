@@ -83,7 +83,7 @@ export default function Signup() {
                 .update({
                     displayName: currentUser.displayName,
                 })
-
+            //--
             setLoading(() => false)
             window.location.href = '/dashboard'
             userMessage(true, `✅ Welcome ${currentUser.displayName}`)
