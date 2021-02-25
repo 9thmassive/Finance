@@ -41,7 +41,7 @@ function Hypothec() {
               <br/>
               <input type="number"  placeholder="Price of the Home" value={homeAmount} onChange={e => setHomeAmount(e.target.value)}/>
               <br/>
-            <h4>Your estimated monthly payment is {monthlyPayment.toFixed(2) + '€'}</h4>
+            <h4>Your estimated monthly payment is {monthlyPayment + '€'}</h4>
             </form>  
 
             <button
@@ -51,7 +51,7 @@ function Hypothec() {
                     result = result * yearAmount;
                     result = result + homeAmount;
                     result = result / 12
-                    result = (result / yearAmount)
+                    result = (result / yearAmount).toFixed(2)
                     setMonthlyPayment(result)  
                 }}
                 className="hypothecButton"
