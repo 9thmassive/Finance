@@ -50,9 +50,9 @@ function Income() {
     const priceRef = useRef()
     //-------------------
 
-    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    // const toDay = () => new Date().toLocaleDateString().split('/').join('-').toString()
+    const toDay = () => '2-27-2021'
     const thisTime = () => ' - ' + new Date().toLocaleTimeString()
-
     function userMessage(num, msg) {
         if (num === 1) {
             return toast.info(msg, {
@@ -101,33 +101,33 @@ function Income() {
         }
         setReq((prev) => !prev)
         //My code here
-        if (!incomeData || !incomeData[toDay()]) {
-            await firebase
-                .firestore()
-                .collection('income')
-                .doc(uid)
-                .set({
-                    [toDay()]: [
-                        {
-                            name: nameRef.current.value,
-                            value: priceRef.current.value,
-                            date: toDay() + thisTime(),
-                        },
-                    ],
-                })
-        } else {
-            await firebase
-                .firestore()
-                .collection('income')
-                .doc(uid)
-                .update({
-                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        date: toDay() + thisTime(),
-                    }),
-                })
-        }
+        // if (!incomeData || !incomeData[toDay()]) {
+        //     await firebase
+        //         .firestore()
+        //         .collection('income')
+        //         .doc(uid)
+        //         .set({
+        //             [toDay()]: [
+        //                 {
+        //                     name: nameRef.current.value,
+        //                     value: priceRef.current.value,
+        //                     date: toDay() + thisTime(),
+        //                 },
+        //             ],
+        //         })
+        // } else {
+        await firebase
+            .firestore()
+            .collection('income')
+            .doc(uid)
+            .update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    date: toDay() + thisTime(),
+                }),
+            })
+        // }
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
