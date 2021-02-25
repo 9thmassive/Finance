@@ -1,77 +1,94 @@
-import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts';
-import firebase from 'firebase';
-import {useEffect, useState, useCallback} from 'react';
-
+import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts'
+import firebase from 'firebase'
+import { useEffect, useState } from 'react'
+const data = [
+    {
+        name: 'March',
+        inc: 1200,
+        exp: 1300,
+    },
+]
 
 export default function App() {
-  const [uid, setUid] = useState(null);
-  const [income, setIncome] = useState([]);
-  const [expense, setExpense] = useState([]);
-  const [mergeIncomeExpense, setMergeIncomeExpense] = useState([]);
+    const [uid, setUid] = useState(null)
+    const [income, setIncome] = useState([])
+    const [expense, setExpense] = useState([])
+    const [mergeIncomeExpense, setMergeIncomeExpense] = useState([])
 
-  const sortByData = useCallback((a,b) => {
-    let tempNameA = a.name.split('-');
-    tempNameA = [tempNameA[2], tempNameA[1], tempNameA[0]].join('');
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged((user) => {
+            setUid(user?.uid)
+        })
+    }, [])
+    //setting income and expense data to state
+    useEffect(() => {
+        if (!uid) {
+            return
+        }
+        firebase
+            .firestore()
+            .collection('income')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                if (doc.data()) {
+                    setIncome(
+                        Object.entries(doc.data()).map(([data, arrOfData]) => {
+                            return [
+                                data,
+                                arrOfData.reduce((a, { value }) => {
+                                    return a + +value
+                                }, 0),
+                            ]
+                        })
+                    )
+                }
+            })
+        firebase
+            .firestore()
+            .collection('expenses')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                if (doc.data()) {
+                    setExpense(
+                        Object.entries(doc.data()).map(([data, arrOfData]) => {
+                            return [
+                                data,
+                                arrOfData.reduce((a, { value }) => {
+                                    return a + +value
+                                }, 0),
+                            ]
+                        })
+                    )
+                }
+            })
+    }, [uid])
+    //----
 
-    let tempNameB = b.name.split('-');
-    tempNameB = [tempNameB[2], tempNameB[1], tempNameB[0]].join('');
-
-    return tempNameA > tempNameB ? 1 : -1;
-  });
-  useEffect(() => {
-    firebase.auth().onAuthStateChanged(user => {
-      setUid(user?.uid);
-    });
-  },[]);
-  //setting income and expense data to state
-  useEffect(() => {
-    if(!uid) {
-      return
-    }
-    firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
-      if(doc.data()) {
-        setIncome(Object.entries(doc.data()).map(([data, arrOfData]) => {
-          return [data, arrOfData.reduce((a,{value}) => {
-            return a + +value;
-          },0)]
-        }))
-      }
-    });
-    firebase.firestore().collection('expenses').doc(uid).onSnapshot(doc => {
-      if(doc.data()) {
-        setExpense(Object.entries(doc.data()).map(([data, arrOfData]) => {
-          return [data, arrOfData.reduce((a,{value}) => {
-            return a + +value;
-          },0)]
-        }))
-      }
-    });
-
-  }, [uid]);
- //----
-
- //merging expense and income
- useEffect(() => {
-    let mergeResult = {};
-    expense.forEach(([date, value]) => {
-      mergeResult[date] = {income: 0, expense: value};
-    });
-    income.forEach(([date, value]) => {
-      if(mergeResult[date]) {
-        mergeResult[date].income = value;
-      } else {
-        mergeResult[date] = {expense: 0, income: value}
-      }
-    });
-    mergeResult = Object.entries(mergeResult).map(([date, {income, expense}]) => {
-      return {income, expense, name: date}
-    }).sort(sortByData);
-    setMergeIncomeExpense(mergeResult)
-
- },[income, expense]);
- useEffect(() => {
-  console.log(expense)
- },[expense])
+    //merging expense and income include merging
+    useEffect(() => {
+        let mergeResult = {}
+        expense.forEach(([date, value]) => {
+            mergeResult[date] = { income: 0, expense: value }
+        })
+        income.forEach(([date, value]) => {
+            if (mergeResult[date]) {
+                mergeResult[date].income = value
+            } else {
+                mergeResult[date] = { expense: 0, income: value }
+            }
+        })
+        mergeResult = Object.entries(mergeResult)
+            .map(([date, { income, expense }]) => {
+                return { income, expense, name: date }
+            })
+            .sort((a, b) => {
+                return +a.name.split('-')[1] - +b.name.split('-')[1]
+            })
+        setMergeIncomeExpense(mergeResult)
+    }, [income, expense])
+    useEffect(() => {
+        console.log(expense)
+    }, [expense])
 
     return (
         <div className="linerChart-container">

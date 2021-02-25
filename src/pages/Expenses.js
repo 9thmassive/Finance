@@ -59,8 +59,9 @@ function Expenses() {
     //-------------------
     const [targetGroup, setTargetGroup] = useState()
 
-    const toDay = () =>
-        new Date().toLocaleDateString().split('/').join('-').toString()
+    // const toDay = () =>
+    //     new Date().toLocaleDateString().split('/').join('-').toString()
+    const toDay = () => '2-27-2021'
 
     const thisTime = () => new Date().toLocaleTimeString()
 
@@ -106,7 +107,7 @@ function Expenses() {
                 .collection('expenses')
                 .doc(uid)
                 .get((doc) => {
-                    if (!doc.data()?.[toDay()]) {
+                    if (!doc.data()[toDay()]) {
                         setEmptyData(!emptyData)
                     }
                 })
@@ -125,38 +126,38 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        if (!emptyData) {
-            await firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .set({
-                    [toDay()]: [
-                        {
-                            group: selectedGroup,
-                            name: nameRef.current.value,
-                            value: priceRef.current.value,
-                            priority: rating,
-                            date: toDay() + thisTime(),
-                        },
-                    ],
-                })
-            setEmptyData((prev) => !prev)
-        } else {
-            await firebase
-                .firestore()
-                .collection('expenses')
-                .doc(uid)
-                .update({
-                    [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                        group: selectedGroup,
-                        name: nameRef.current.value,
-                        value: priceRef.current.value,
-                        priority: rating,
-                        date: toDay() + ' - ' + thisTime(),
-                    }),
-                })
-        }
+        // if (!emptyData) {
+        //     await firebase
+        //         .firestore()
+        //         .collection('expenses')
+        //         .doc(uid)
+        //         .set({
+        //             [toDay()]: [
+        //                 {
+        //                     group: selectedGroup,
+        //                     name: nameRef.current.value,
+        //                     value: priceRef.current.value,
+        //                     priority: rating,
+        //                     date: toDay() + thisTime(),
+        //                 },
+        //             ],
+        //         })
+        //     setEmptyData((prev) => !prev)
+        // } else {
+        await firebase
+            .firestore()
+            .collection('expenses')
+            .doc(uid)
+            .update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    group: selectedGroup,
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    priority: rating,
+                    date: toDay() + ' - ' + thisTime(),
+                }),
+            })
+        // }
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
@@ -171,7 +172,7 @@ function Expenses() {
             .collection('expenses')
             .doc(uid)
             .onSnapshot((doc) => {
-                if (doc.data()[toDay()]) {
+                if (doc.data()?.[toDay()]) {
                     setRowData(doc.data()[toDay()].reverse())
                 }
             })

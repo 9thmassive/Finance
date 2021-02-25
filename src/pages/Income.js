@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Spinner} from 'react-bootstrap'
+import { Button, Spinner } from 'react-bootstrap'
 import { Form } from 'react-bootstrap'
 import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import { toast } from 'react-toastify'
@@ -11,34 +11,37 @@ import './inc.css'
 toast.configure()
 
 function Income() {
-    const [uid, setUid] = useState(null);
-    const [incomeGridData, setIncomeGridData] = useState([]);
-    const [incomeData, setIncomeData] = useState(null);
+    const [uid, setUid] = useState(null)
+    const [incomeGridData, setIncomeGridData] = useState([])
+    const [incomeData, setIncomeData] = useState(null)
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((currentUser) => {
             setUid(currentUser?.uid)
         })
-    }, []);
+    }, [])
 
     useEffect(() => {
-      if(uid === null) {
-        return
-      }
-      firebase.firestore().collection('income').doc(uid).onSnapshot(doc => {
-        setIncomeData(doc.data());
-
-      })
-    },[uid]);
-
-    useEffect(() => {
-      if(!incomeData) return;
-        let dataResult = [];
-        for(let data of Object.values(incomeData)) {
-          dataResult = [ ...dataResult, ...data]
+        if (uid === null) {
+            return
         }
-        setIncomeGridData(dataResult);
-    },[incomeData])
+        firebase
+            .firestore()
+            .collection('income')
+            .doc(uid)
+            .onSnapshot((doc) => {
+                setIncomeData(doc.data())
+            })
+    }, [uid])
+
+    useEffect(() => {
+        if (!incomeData) return
+        let dataResult = []
+        for (let data of Object.values(incomeData)) {
+            dataResult = [...dataResult, ...data]
+        }
+        setIncomeGridData(dataResult)
+    }, [incomeData])
 
     const [req, setReq] = useState(true)
 
@@ -47,9 +50,9 @@ function Income() {
     const priceRef = useRef()
     //-------------------
 
-    const toDay = () => new Date().toLocaleDateString().split('/').join('-')
+    // const toDay = () => new Date().toLocaleDateString().split('/').join('-').toString()
+    const toDay = () => '2-27-2021'
     const thisTime = () => ' - ' + new Date().toLocaleTimeString()
-
     function userMessage(num, msg) {
         if (num === 1) {
             return toast.info(msg, {
@@ -86,9 +89,7 @@ function Income() {
         }
     }
 
-
     async function handleAddIncome() {
-
         if (parseInt(priceRef.current.value) !== +priceRef.current.value) {
             priceRef.current.style.border = 'red solid 3px'
 
@@ -100,33 +101,33 @@ function Income() {
         }
         setReq((prev) => !prev)
         //My code here
-        if(!incomeData || !incomeData[toDay()]) {
-          await firebase
-                .firestore()
-                .collection('income')
-                .doc(uid)
-                .set({
-                  [toDay()]: [
-                    {
-                      name: nameRef.current.value,
-                      value: priceRef.current.value,
-                      date: toDay() + thisTime(),
-                    }
-                  ]
-                })
-        } else {
-          await firebase
-                .firestore()
-                .collection('income')
-                .doc(uid)
-                .update({
-                  [toDay()]: firebase.firestore.FieldValue.arrayUnion({
-                      name: nameRef.current.value,
-                      value: priceRef.current.value,
-                      date: toDay() + thisTime(),
-                  })
-                })
-        }
+        // if (!incomeData || !incomeData[toDay()]) {
+        //     await firebase
+        //         .firestore()
+        //         .collection('income')
+        //         .doc(uid)
+        //         .set({
+        //             [toDay()]: [
+        //                 {
+        //                     name: nameRef.current.value,
+        //                     value: priceRef.current.value,
+        //                     date: toDay() + thisTime(),
+        //                 },
+        //             ],
+        //         })
+        // } else {
+        await firebase
+            .firestore()
+            .collection('income')
+            .doc(uid)
+            .update({
+                [toDay()]: firebase.firestore.FieldValue.arrayUnion({
+                    name: nameRef.current.value,
+                    value: priceRef.current.value,
+                    date: toDay() + thisTime(),
+                }),
+            })
+        // }
 
         setReq((prev) => !prev)
         return userMessage(1, 'Added successFull')
@@ -153,36 +154,34 @@ function Income() {
                         }}
                     />
                 </div>
-                <br/>
+                <br />
                 <div className="incomeData">
-
-
-                {req ? (
-                    <Button
-                        className="btn mainColor w-50"
-                        onClick={handleAddIncome}
-                    >
-                        Add List
-                    </Button>
-                ) : (
-                    <Button
-                        className="w-50 mainColor"
-                        variant="primary"
-                        disabled
-                    >
-                        <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                        />
-                        <span className="sr-only">Loading...</span>
-                    </Button>
-                )}
+                    {req ? (
+                        <Button
+                            className="btn mainColor w-50"
+                            onClick={handleAddIncome}
+                        >
+                            Add List
+                        </Button>
+                    ) : (
+                        <Button
+                            className="w-50 mainColor"
+                            variant="primary"
+                            disabled
+                        >
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                            <span className="sr-only">Loading...</span>
+                        </Button>
+                    )}
                 </div>
             </div>
-            <br/>
+            <br />
 
             <div className="listt incomeData">
                 <br />

@@ -107,7 +107,7 @@ export default function Cards() {
         <div className="cart-container">
             {cardInfo.map(({ money, type, icon }, index) => {
                 return (
-                    <>
+                 
                         <Cart
                             barData={data}
                             font_color={money < 0 ? '#aa2b1d' : null}
@@ -116,7 +116,7 @@ export default function Cards() {
                             icon={icon}
                             key={index}
                         />
-                    </>
+                   
                 )
             })}
         </div>
