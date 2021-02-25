@@ -106,7 +106,7 @@ function Expenses() {
                 .collection('expenses')
                 .doc(uid)
                 .get((doc) => {
-                    if (!doc.data()[toDay()]) {
+                    if (!doc.data()?.[toDay()]) {
                         setEmptyData(!emptyData)
                     }
                 })
@@ -125,7 +125,7 @@ function Expenses() {
             return userMessage(1, '😕 Name - Input should not be empty')
         }
         setReq((prev) => !prev)
-        if (emptyData) {
+        if (!emptyData) {
             await firebase
                 .firestore()
                 .collection('expenses')
