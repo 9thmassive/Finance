@@ -1,13 +1,7 @@
 import { AreaChart, XAxis, YAxis, Tooltip, CartesianGrid, Area } from 'recharts';
 import firebase from 'firebase';
-import {useEffect, useState} from 'react';
-const data = [
-    {
-        name: 'March',
-        inc: 1200,
-        exp: 1300,
-    },
-]
+import {useEffect, useState, useCallback} from 'react';
+
 
 export default function App() {
   const [uid, setUid] = useState(null);
@@ -15,6 +9,15 @@ export default function App() {
   const [expense, setExpense] = useState([]);
   const [mergeIncomeExpense, setMergeIncomeExpense] = useState([]);
 
+  const sortByData = useCallback((a,b) => {
+    let tempNameA = a.name.split('-');
+    tempNameA = [tempNameA[2], tempNameA[1], tempNameA[0]].join('');
+
+    let tempNameB = b.name.split('-');
+    tempNameB = [tempNameB[2], tempNameB[1], tempNameB[0]].join('');
+
+    return tempNameA > tempNameB ? 1 : -1;
+  });
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       setUid(user?.uid);
@@ -47,7 +50,7 @@ export default function App() {
   }, [uid]);
  //----
 
- //merging expense and income include merging
+ //merging expense and income
  useEffect(() => {
     let mergeResult = {};
     expense.forEach(([date, value]) => {
@@ -62,9 +65,7 @@ export default function App() {
     });
     mergeResult = Object.entries(mergeResult).map(([date, {income, expense}]) => {
       return {income, expense, name: date}
-    }).sort((a,b) => {
-      return +a.name.split('-')[1] - +b.name.split('-')[1]
-    });
+    }).sort(sortByData);
     setMergeIncomeExpense(mergeResult)
 
  },[income, expense]);
