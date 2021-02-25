@@ -2,65 +2,64 @@ import React, { Component } from "react";
 //import React from 'react';
 import './Hypothec.css'
 import ReactDOM from 'react-dom'
-//var ReactDOM = require('react-dom')
 import { useState, useEffect } from 'react'
 
-//class Hypothec extends React.Component {
-var MortgageForm = React.createClass({
-    mortgageCalc: function() {
-        //findDOMNode to pull entered values into function   
-        var principal = React.findDOMNode(this.refs.principal).value,
-            rate = React.findDOMNode(this.refs.rate).value,
-            term = React.findDOMNode(this.refs.term).value;
+function Hypothec() {
+    const [yearAmount, setYearAmount] = useState('');
+    const [rateAmount, setRateAmount] = useState('');
+    const [homeAmount, setHomeAmount] = useState('');
+    const [monthlyPayment, setMonthlyPayment] = useState('');
+
         //Can use a whole number percentage or decimal
-        if(rate > 1){
-            rate = rate * 0.01;
+        /*if(rateAmount > 1){
+            rateAmount = rateAmount * 0.01;
         }else{
-            rate = rate;  
+            rateAmount = rateAmount;  
         }
         //Can accept term in years or months
-        if(term <= 30){
-            term = term * 12;
+        if(yearAmount <= 30){
+            yearAmount = yearAmount * 12;
         }else{
-            term = term;
-        }
-        var monthlyRate = rate/12;
-        var factor = Math.pow(monthlyRate + 1, term);
-        var numerator = monthlyRate * factor;
-        var denominator = factor - 1;
-        var quotient =  numerator/denominator;
-        var payment = principal * quotient;
-        console.log('$' + payment.toFixed(2));
-        return payment.toFixed(2);
-    },
-    getInitialState: function() {
-        return {value: 0, payment: '0.00'}
-    },
-    handleChange: function(event) {
-        this.setState({value: event.target.value, payment: this.mortgageCalc()});
-    },
+            yearAmount = yearAmount;
+        }*/
 
-        render: function() {
-            
+        /*var factor = Math.pow( (rate/12) + 1, term );
+        var numerator = monthlyRate * factor;
+        var payment = principal * ( numerator/(factor - 1) );*/
+        
         return (
           <div className="form-group">
-            <h2><center>Hypothec Calculator</center></h2><br/>
-            <form className="form-group">
-              <input type="number" ref="principal" placeholder="Salary" onChange={this.handleChange}/><br/>
-              <input type="number" ref="term" placeholder="How many Years" onChange={this.handleChange}/><br/>
-              <input type="number" ref="rate" placeholder="Rate" onChange={this.handleChange}/><br/>
-              <input type="number" ref="term" placeholder="Price of the Home" onChange={this.handleChange}/><br/>
 
-               <input type="number" ref="principal" placeholder="Loan Amount" value={this.state.value.principal} onChange={this.handleChange}/><br/>
-               <input type="number" ref="rate" placeholder="Interest Rate" value={this.state.value.rate} onChange={this.handleChange}/><br/>
-               <input type="number" ref="term" placeholder="Length of loan" value={this.state.value.term} onChange={this.handleChange}/><br/>
-               <h4>Your estimated monthly payment is ${this.state.payment}</h4>
-            </form>        
+            <h2><center>Hypothec Calculator</center></h2>
+            <br/>
+            <form className="form-group">
+              <input type="number"  placeholder="How many Years" value={yearAmount} onChange={e => setYearAmount(e.target.value)}/>
+              <br/>
+              <br/>
+              <input type="number"  placeholder="Rate" value={rateAmount} onChange={e => setRateAmount(e.target.value)}/>
+              <br/>
+              <br/>
+              <input type="number"  placeholder="Price of the Home" value={homeAmount} onChange={e => setHomeAmount(e.target.value)}/>
+        <br/>
+               <h4>Your estimated monthly payment is {monthlyPayment.toFixed(2) + '€'}</h4>
+            </form>  
+
+            <button
+                onClick={()=>{
+                    let result= homeAmount;
+                    result = (homeAmount * rateAmount) / 100;
+                    result = result * yearAmount;
+                                        result = result + homeAmount;
+                                        result = result / 12
+                                        result = (result / yearAmount)
+                                        setMonthlyPayment(result)  
+                }}
+                className="hypothecButton"
+                type="submit"
+            > Calculate
+            </button>      
           </div>
         )
     }
-})
 
-ReactDOM.render(<MortgageForm/>, document.getElementById('form'));
-
-export default MortgageForm //mortgageCalc//MortgageForm//Hypothec 
+export default Hypothec
