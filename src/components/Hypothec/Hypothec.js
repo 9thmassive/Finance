@@ -26,12 +26,12 @@ function Hypothec() {
         /*var factor = Math.pow( (rate/12) + 1, term );
         var numerator = monthlyRate * factor;
         var payment = principal * ( numerator/(factor - 1) );*/
-        
+
         return (
           <div className="form-group">
 
             <h2><center>Hypothec Calculator</center></h2>
-            <br/>
+            <br/>            
             <form className="form-group">
               <input type="number"  placeholder="How many Years" value={yearAmount} onChange={e => setYearAmount(e.target.value)}/>
               <br/>
@@ -40,8 +40,8 @@ function Hypothec() {
               <br/>
               <br/>
               <input type="number"  placeholder="Price of the Home" value={homeAmount} onChange={e => setHomeAmount(e.target.value)}/>
-        <br/>
-               <h4>Your estimated monthly payment is {monthlyPayment.toFixed(2) + '€'}</h4>
+              <br/>
+            <h4>Your estimated monthly payment is {monthlyPayment.toFixed(2) + '€'}</h4>
             </form>  
 
             <button
@@ -49,10 +49,10 @@ function Hypothec() {
                     let result= homeAmount;
                     result = (homeAmount * rateAmount) / 100;
                     result = result * yearAmount;
-                                        result = result + homeAmount;
-                                        result = result / 12
-                                        result = (result / yearAmount)
-                                        setMonthlyPayment(result)  
+                    result = result + homeAmount;
+                    result = result / 12
+                    result = (result / yearAmount)
+                    setMonthlyPayment(result)  
                 }}
                 className="hypothecButton"
                 type="submit"
