@@ -3,14 +3,15 @@ import './App.css'
 import { useState, useEffect } from 'react'
 import Login from './components/registration/Login'
 import Signup from './components/registration/Signup'
-import User from './components/Rotation/User'
+
 import ForgotPassword from './components/registration/ForgotPassword'
 import Navbar from './components/NavBar/Navbar'
+import { Tabs, Tab } from 'react-bootstrap'
 
 import LeadingPage from './components/leadingPage/LeadingPage'
+import Hypotec from './components/Hypothec/Hypothec'
 
 import MainDeposit from './components/Deposit/MainDeposit'
-
 
 import Transaction from './pages/Transaction'
 import Income from './pages/Income'
@@ -23,9 +24,11 @@ import {
     Switch,
     Redirect,
     Route,
+    useHistory,
 } from 'react-router-dom'
 
 function App() {
+    let history = useHistory()
     const [user, setUser] = useState(null)
     const [income, setIncome] = useState(null)
     const [expenses, setExpenses] = useState(null)
@@ -38,25 +41,8 @@ function App() {
                     .doc(firebaseUser.uid)
                     .get()
             }
-            // async function manageIncomeExpenses() {
-            //     const firestoreCurrentCollection = await firebase
-            //         .firestore()
-            //         .collection('income')
-            //         .doc(firebaseUser.uid)
-            //         .get()
-
-            //     if (firestoreCurrentCollection.exists) {
-            //         firebase
-            //             .firestore()
-            //             .collection('income')
-            //             .doc(firebaseUser.uid)
-            //             .set({ incomeValue: 0, expensesValue: 0 })
-            //     } else {
-            //     }
-            // }
             setUser(firebaseUser)
             if (firebaseUser) {
-                // manageIncomeExpenses()
                 firebase
                     .firestore()
                     .collection('user')
@@ -78,26 +64,16 @@ function App() {
                     <Route path="/income" component={Income} />
                     <Route path="/expenses" component={Expenses} />
                     <Route exact path="/">
-                        {user ? (
-                            <Redirect push to="/dashboard" />
-                        ) : (
-                            <LeadingPage />
-                        )}
+                        {user ? <Dashboard /> : <LeadingPage />}
                     </Route>
                     <Router exact path="/dashboard">
-                        <Dashboard />
+                        {user ? <Dashboard /> : <LeadingPage />}
                     </Router>
                     <Router exact path="/registration">
-                        <Signup />
+                        {user ? <Dashboard /> : <Signup />}
                     </Router>
                     <Route exact path="/login">
-                        <Login />
-                    </Route>
-                    <Route exact path="/user">
-                        <User />
-                    </Route>
-                    <Route exact path="/profile">
-                        <Profile />
+                        {user ? <Dashboard /> : <Login />}
                     </Route>
                     <Route exact path="/forgot-password">
                         <ForgotPassword />
@@ -106,7 +82,21 @@ function App() {
                         <FindSaving />
                     </Route>
                     <Route exact path="/calculator">
-                      <MainDeposit/>
+                        <div className="calc">
+                            <div className="tabs-calc">
+                                <Tabs
+                                    defaultActiveKey="Hypotec"
+                                    id="uncontrolled-tab-example"
+                                >
+                                    <Tab eventKey="Deposit" title="Deposit">
+                                        <MainDeposit />
+                                    </Tab>
+                                    <Tab eventKey="Hypotec" title="Hypotec">
+                                        <Hypotec />
+                                    </Tab>
+                                </Tabs>
+                            </div>
+                        </div>
                     </Route>
                 </Switch>
             </Router>

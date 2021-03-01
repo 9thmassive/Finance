@@ -24,7 +24,7 @@ function Navbar() {
                     >
                         Log Out
                     </button>
-                    <Link to="#" className="menu-bars"></Link>
+                   
                 </div>
                 <nav
                     className={!sidebar ? 'nav-menu active' : 'nav-menu'}
